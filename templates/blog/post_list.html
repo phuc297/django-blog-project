@@ -1,0 +1,18 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+  Nền tảng chia sẻ hàng đầu Việt Nam
+{% endblock %}
+
+{% block content %}
+  {% for post in posts %}
+    <div>
+      <a href="{% url 'blog:detail' post.id %}" class="cursor-pointer hover:underline ">{{ post.title }}</a>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}
