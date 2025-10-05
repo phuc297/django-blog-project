@@ -6,10 +6,6 @@
 
 
 # 2 Sinh dữ liệu ngẫu nhiên
-```bash
-pip install -r .\requirements.txt
-```
-
 vào file **`fake.py`** để tùy chỉnh:
 
 |  |  |
