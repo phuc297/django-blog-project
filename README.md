@@ -5,7 +5,7 @@
 **apps folders**: users, blog, interactions
 
 
-# Sinh Dữ Liệu
+# 2 Sinh Dữ Liệu
 ```bash
 pip install -r .\requirements.txt
 ```
@@ -38,7 +38,7 @@ exit()
 ```
 
 
-# Tạo môi trường
+# 1 Tạo môi trường
 
 
 ```
