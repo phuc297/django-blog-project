@@ -11,4 +11,9 @@ class Profile(models.Model):
     bio = models.TextField()
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     following = models.ManyToManyField('self', symmetrical=False, related_name='followers')
+    
+    def __str__(self):
+        
+        
+        return str(self.user)
 

@@ -7,6 +7,9 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return self.content
+    
 
 class Like(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
@@ -15,6 +18,9 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ('user', 'post')
+        
+    def __str__(self):
+        return f"{self.user} likes {self.post}"
 
 
 # class Bookmark(models.Model):
