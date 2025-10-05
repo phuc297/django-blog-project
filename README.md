@@ -5,7 +5,7 @@
 **apps folders**: users, blog, interactions
 
 
-# 2 Sinh Dữ Liệu
+# 2 Sinh dữ liệu ngẫu nhiên
 ```bash
 pip install -r .\requirements.txt
 ```
