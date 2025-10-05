@@ -38,6 +38,9 @@ exit()
 ```
 
 
+# Tạo môi trường
+
+
 ```
 python -m venv venv
 ```
