@@ -4,25 +4,6 @@
 
 **apps folders**: users, blog, interactions
 
-```
-python -m venv venv
-```
-
-```
-.\venv\Scripts\activate
-```
-
-```
-python -m pip install --upgrade pip
-```
-
-```
-pip install -r .\requirements.txt
-```
-
-```
-python .\manage.py migrate
-```
 
 # Sinh Dữ Liệu
 ```bash
@@ -55,6 +36,29 @@ Fake()
 ```bash
 exit()
 ```
+
+
+```
+python -m venv venv
+```
+
+```
+.\venv\Scripts\activate
+```
+
+```
+python -m pip install --upgrade pip
+```
+
+```
+pip install -r .\requirements.txt
+```
+
+```
+python .\manage.py migrate
+```
+
+
 
 
 
