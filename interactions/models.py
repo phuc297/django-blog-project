@@ -10,6 +10,9 @@ class Comment(models.Model):
     def __str__(self):
         return self.content
     
+    class Meta:
+        ordering = ["-created_at"]
+    
 
 class Like(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)

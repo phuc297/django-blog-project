@@ -1,15 +1,124 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}
   {{ post.title }}
 {% endblock %}
 
 {% block content %}
-  <h1 class="text-4xl">{{ post.title }}</h1>
-  <p>{{ post.content }}</p>
+  <div class="m-auto">
+    <div class="w-1/2 m-auto">
+      <h1 class="font-bold text-3xl md:text-4xl pt-4 pb-2">{{ post.title }}</h1>
+
+      <div class="flex items-center py-8">
+        <a href=""><img class="w-16 h-16 rounded-full mr-4" src="{{ post.author.profile.avatar.url }}" alt="Author" /></a>
+        <div class="flex-1">
+          <a href="" class="font-bold text-xl">{{ post.author }}</a>
+          <p class="text-sm text-gray-600">Published {{ post.created_at }}</p>
+        </div>
+        <div id="following-status">
+          <button id="btn-follow" class="border p-2 w-28 border-gray-200 text-gray-300">+ Follow</button>
+        </div>
+      </div>
+
+      <article>{{ post.content }}</article>
+    </div>
+
+    <div class="border-t-1 border-gray-200 mt-8 mx-16">
+      <div class="m-auto w-1/2 mx-auto pt-8 mb-16">
+        <h1 class="text-4xl">Bình luận</h1>
+
+        <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'interactions:comment' %}" method="post">
+          {% csrf_token %}
+          <textarea name="content" cols="10" rows="10" class="w-full rounded-t-lg bg-white focus:outline-2 outline-offset-3 outline-green-500 text-gray-700 p-4" style="height: 171px;" required="" id="id_content"></textarea>
+
+          <input type="hidden" name="post_id" value="{{ post.id }}" />
+          <div class="p-3">
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg border border-gray-300 hover:bg-green-600">Submit</button>
+          </div>
+        </form>
+
+        <div id="commentList" class="mt-10">
+          {% for comment in post.comments.all %}
+            <div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
+              <div class="flex items-center">
+                <img class="w-12 h-12 rounded-full" src="{{ comment.user.profile.avatar.url }}" alt="User" />
+                <p class="hover:underline cursor-pointer">{{ comment.user }}</p>
+              </div>
+              <p class="text-gray-500 text-sm mb-1">Posted {{ comment.created_at }}</p>
+              <p class="">{{ comment.content }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block script %}
+  <script>
+    form = document.getElementById('commentForm')
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
+      post_id = form.querySelector('[name=post_id]').value
+      content = form.querySelector('[name=content]').value
+      console.log(form.action)
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+          post_id: post_id,
+          content: content
+        })
+      })
+    
+      if (response.redirected) {
+        const redirectUrl = response.url
+        if (redirectUrl.includes('login')) {
+          alert('You need to be logged in to comment. Redirecting to login...')
+          window.location.href = redirectUrl
+          return
+        }
+      }
+    
+      const contentType = response.headers.get('Content-Type')
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Expected JSON, but received: ', response)
+        alert('Unexpected response format. Please try again.')
+        return
+      }
+    
+      if (!response.ok) {
+        text = await response.text()
+        alert('An error occurred: ' + text)
+        return
+      }
+    
+      const result = await response.json()
+    
+      if (result.status == 'success') {
 
+        const newCommentDiv = `<div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
+              <div class="flex items-center">
+                <img class="w-12 h-12 rounded-full" src="${result.avatar_url}" alt="User" />
+                <p class="hover:underline cursor-pointer">${result.user}</p>
+              </div>
+              <p class="text-gray-500 text-sm mb-1">Posted ${result.created_at}</p>
+              <p class="">${result.content}</p>
+            </div>`            
+
+
+    
+        document.getElementById('commentList').insertAdjacentHTML('afterbegin', newCommentDiv)
+        form.querySelector('[name=content]').value = ''
+      } else {
+        console.error(result.error)
+      }
+    })
+  </script>
 {% endblock %}

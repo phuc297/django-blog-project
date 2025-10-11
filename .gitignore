@@ -215,5 +215,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+staticfiles/
+mediafiles/avatars/
+mediafiles/thumbnails/
 
 fake.*.py
+test.py
+script.*.py

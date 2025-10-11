@@ -1,5 +1,7 @@
 from django.db import models
 
+from utils.media_utils import get_random_thumbnail
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -19,6 +21,7 @@ class Tag(models.Model):
 class Post(models.Model):
     author = models.ForeignKey('users.User', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    thumbnail = models.ImageField(upload_to='thumnails/', default=get_random_thumbnail)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

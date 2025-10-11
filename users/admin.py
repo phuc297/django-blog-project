@@ -5,7 +5,7 @@ admin.site.register(User)
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    fields = ['bio', 'avatar', 'following']
+    fields = ['user', 'bio', 'avatar', 'following']
 
 
 admin.site.register(Profile, ProfileAdmin)

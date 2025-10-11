@@ -16,31 +16,32 @@ fake = Faker()
 User = get_user_model()
 
 # Tùy chỉnh
-NUMBER_OF_USERS = 20 # Số lượng người dùng (User) 
-NUMBER_OF_CATEGORIES = 10 # Số lượng danh mục (Category)
-NUMBER_OF_TAGS = 20 # Số lượng thẻ/nhãn (Tag)
-NUMBER_OF_POSTS = 50 # Số lượng bài viết (Post)
-NUMBER_OF_COMMENTS = 80 # Tổng số lượng bình luận (Comment)
+NUMBER_OF_USERS = 20  # Số lượng người dùng (User)
+NUMBER_OF_CATEGORIES = 20  # Số lượng danh mục (Category)
+NUMBER_OF_TAGS = 30  # Số lượng thẻ/nhãn (Tag)
+NUMBER_OF_POSTS = 50  # Số lượng bài viết (Post)
+NUMBER_OF_COMMENTS = 200  # Tổng số lượng bình luận (Comment)
 MIN_FOLLOWERS_PER_USER = 2
 MAX_FOLLOWERS_PER_USER = 5
 
 
 class Fake:
-    def __init__(self, generate=True, delete=True):
-        if delete:
-            self.delete_data()
+    def __init__(self, generate=True, reset=True, delete_users=False):
+        if reset:
+            if delete_users:
+                User.objects.all().filter(is_superuser=False).delete()
+            Post.objects.all().delete()
+            Category.objects.all().delete()
+            Tag.objects.all().delete()
         if generate:
-            self.generate_users(NUMBER_OF_USERS)
-            self.create_follower(MIN_FOLLOWERS_PER_USER, MAX_FOLLOWERS_PER_USER)
+            if User.objects.all().count() < 2:
+                self.generate_users(NUMBER_OF_USERS)
+                self.create_follower(MIN_FOLLOWERS_PER_USER,
+                                     MAX_FOLLOWERS_PER_USER)
             self.generate_categories(NUMBER_OF_CATEGORIES)
             self.generate_tags(NUMBER_OF_TAGS)
             self.generate_posts(NUMBER_OF_POSTS)
             self.generate_comments(NUMBER_OF_COMMENTS)
-
-    def delete_data(self):
-        User.objects.all().filter(is_superuser=False).delete()
-        Category.objects.all().delete()
-        Tag.objects.all().delete()
 
     def generate_users(self, number):
         for _ in range(number):
@@ -70,21 +71,21 @@ class Fake:
         for i in range(n_posts):
             mock_post = {
                 "author": choice(users),
-                "title": fake.sentence(randrange(8, 10)),
+                "title": fake.sentence(randrange(10, 20)),
                 "content": fake.paragraph(150),
                 "list_categories": random.sample(list(categories), randrange(1, 3)),
-                # "list_tags": random.sample(list(tags), randrange(1, 5)),
+                "list_tags": random.sample(list(tags), randrange(1, 5)),
             }
             post = Post(author=mock_post["author"], title=mock_post["title"],
                         content=mock_post["content"])
             post.published = True
-            
+
             post.save()
-            post.categories.set(mock_post["list_categories"]) 
-            # post.tags.set(mock_post["list_tags"])
+            post.categories.set(mock_post["list_categories"])
+            post.tags.set(mock_post["list_tags"])
             post.save()
             posts.append(post)
-            
+
         sys.stdout.write(f"create {len(posts)} posts successful !\n")
         sys.stdout.flush()
 
@@ -104,16 +105,16 @@ class Fake:
         Comment.objects.bulk_create(comments)
         sys.stdout.write(f"create {len(comments)} comments successful !\n")
         sys.stdout.flush()
-        
+
     def generate_tags(self, n_tags=20):
         tags = []
 
         for _ in range(n_tags):
-            tags.append(fake.word())
+            tags.append(fake.word().lower())
 
-        for tag in tags: 
+        for tag in tags:
             c = Tag.objects.get_or_create(name=tag)
-            
+
         sys.stdout.write(f"create {len(tags)} tags successful !\n")
         sys.stdout.flush()
 
@@ -123,8 +124,8 @@ class Fake:
         category_names = set()
 
         while len(category_names) < n_cat:
-            category_names.add(' '.join(fake.words(nb=randint(2, 3))).capitalize())
-
+            category_names.add(
+                ' '.join(fake.words(nb=randint(2, 3))).capitalize())
 
         for i, name in enumerate(list(category_names)[:n_cat]):
             description = fake.paragraph(
@@ -139,6 +140,6 @@ class Fake:
         for cat in categories:
             c = Category.objects.get_or_create(
                 name=cat["name"], description=cat["description"])
-            
+
         sys.stdout.write(f"create {n_cat} categories successful !\n")
         sys.stdout.flush()
