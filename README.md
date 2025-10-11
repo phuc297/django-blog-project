@@ -5,11 +5,7 @@
 **apps folders**: users, blog, interactions
 
 
-# Sinh Dữ Liệu
-```bash
-pip install -r .\requirements.txt
-```
-
+# 2 Sinh dữ liệu ngẫu nhiên
 vào file **`fake.py`** để tùy chỉnh:
 
 |  |  |
@@ -38,7 +34,7 @@ exit()
 ```
 
 
-# Tạo môi trường
+# 1 Tạo môi trường
 
 
 ```
