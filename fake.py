@@ -7,8 +7,7 @@ import sys
 from django.contrib.auth import get_user_model
 from faker import Faker
 
-from blog.models import Category, Post, Tag
-from interactions.models import Comment
+from blog.models import Category, Post, Tag, Comment
 from users.models import Profile
 
 fake = Faker()
@@ -36,6 +35,7 @@ class Fake:
         if generate:
             if User.objects.all().count() < 2:
                 self.generate_users(NUMBER_OF_USERS)
+                self.random_profile()
                 self.create_follower(MIN_FOLLOWERS_PER_USER,
                                      MAX_FOLLOWERS_PER_USER)
             self.generate_categories(NUMBER_OF_CATEGORIES)
@@ -63,6 +63,12 @@ class Fake:
             for follower in random_follower:
                 profile.followers.add(follower)
 
+    def random_profile(self):
+        profiles = Profile.objects.all()
+        for p in profiles:
+            p.bio = fake.sentence(randrange(5, 30))
+            p.save()
+
     def generate_posts(self, n_posts):
         posts = []
         categories = Category.objects.all()
@@ -71,12 +77,13 @@ class Fake:
         for i in range(n_posts):
             mock_post = {
                 "author": choice(users),
-                "title": fake.sentence(randrange(10, 20)),
+                "title": fake.sentence(randrange(8, 20)),
+                "description": fake.sentence(randrange(10, 20)),
                 "content": fake.paragraph(150),
                 "list_categories": random.sample(list(categories), randrange(1, 3)),
                 "list_tags": random.sample(list(tags), randrange(1, 5)),
             }
-            post = Post(author=mock_post["author"], title=mock_post["title"],
+            post = Post(author=mock_post["author"], title=mock_post["title"], description=mock_post["description"],
                         content=mock_post["content"])
             post.published = True
 

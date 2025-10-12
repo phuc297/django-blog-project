@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from utils.media_utils import get_random_avatar
+from .utils import get_random_avatar
 
 
 

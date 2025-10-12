@@ -6,15 +6,36 @@
   {{ post.title }}
 {% endblock %}
 
+{% block head %}
+{% endblock %}
+
 {% block content %}
   <div class="m-auto">
-    <div class="w-1/2 m-auto">
+    <div id="sticky-bar" class="fixed top-1/2 left-1/6 -translate-y-1/2 w-20 text-gray-500">
+      <div class="flex flex-col items-center space-y-2">
+        <button id="like" class="flex justify-center items-center h-8 w-8 rounded-full border cursor-pointer transition border-gray-500 hover:text-green-500 hover:border-green-500">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8.39 18.49V8.33c0-.4.12-.79.34-1.12l2.73-4.06c.43-.65 1.5-1.11 2.44-.77.98.33 1.63 1.43 1.42 2.41l-.52 3.27c-.04.3.03.57.2.78.17.19.43.3.7.3h4.11c.79 0 1.47.32 1.85.86.38.54.45 1.25.21 1.93l-2.46 7.49c-.31 1.25-1.66 2.22-3.01 2.22h-3.9c-.67 0-1.61-.23-2.04-.66l-1.28-.99c-.49-.37-.79-.96-.79-1.58Z" />
+            <path d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46v10.06c0 1.48.63 2.08 2.18 2.08h1.03c1.55 0 2.18-.6 2.18-2.08V8.46c0-1.48-.63-2.08-2.18-2.08Z" />
+          </svg>
+        </button>
+
+        <button id="comment" onclick="scrollToComment()" class="flex justify-center items-center h-8 w-8 rounded-full border cursor-pointer transition border-gray-500 hover:text-green-500 hover:border-green-500">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M14 3.5v6A1.5 1.5 0 0 1 12.5 11H8.75L3.5 14l.75-3H3.5A1.5 1.5 0 0 1 2 9.5v-6A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5Z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="w-1/2 m-auto mt-10">
+      <p class="text-gray-500 hover:underline cursor-pointer text-xl">{{ post.categories.first }}</p>
       <h1 class="font-bold text-3xl md:text-4xl pt-4 pb-2">{{ post.title }}</h1>
 
       <div class="flex items-center py-8">
-        <a href=""><img class="w-16 h-16 rounded-full mr-4" src="{{ post.author.profile.avatar.url }}" alt="Author" /></a>
+        <a href="{% url 'users:profile' post.author.profile.id %}"><img class="w-16 h-16 rounded-full mr-4" src="{{ post.author.profile.avatar.url }}" alt="Author" /></a>
         <div class="flex-1">
-          <a href="" class="font-bold text-xl">{{ post.author }}</a>
+          <a href="{% url 'users:profile' post.author.profile.id %}" class="font-bold text-xl">{{ post.author }}</a>
           <p class="text-sm text-gray-600">Published {{ post.created_at }}</p>
         </div>
         <div id="following-status">
@@ -22,14 +43,14 @@
         </div>
       </div>
 
-      <article>{{ post.content }}</article>
+      <article class="text-justify text-xl/8">{{ post.content }}</article>
     </div>
 
     <div class="border-t-1 border-gray-200 mt-8 mx-16">
       <div class="m-auto w-1/2 mx-auto pt-8 mb-16">
         <h1 class="text-4xl">Bình luận</h1>
 
-        <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'interactions:comment' %}" method="post">
+        <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'blog:comment' %}" method="post">
           {% csrf_token %}
           <textarea name="content" cols="10" rows="10" class="w-full rounded-t-lg bg-white focus:outline-2 outline-offset-3 outline-green-500 text-gray-700 p-4" style="height: 171px;" required="" id="id_content"></textarea>
 
@@ -57,68 +78,6 @@
 {% endblock %}
 
 {% block script %}
-  <script>
-    form = document.getElementById('commentForm')
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
-      post_id = form.querySelector('[name=post_id]').value
-      content = form.querySelector('[name=content]').value
-      console.log(form.action)
-      const response = await fetch(form.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-          post_id: post_id,
-          content: content
-        })
-      })
-    
-      if (response.redirected) {
-        const redirectUrl = response.url
-        if (redirectUrl.includes('login')) {
-          alert('You need to be logged in to comment. Redirecting to login...')
-          window.location.href = redirectUrl
-          return
-        }
-      }
-    
-      const contentType = response.headers.get('Content-Type')
-      if (!contentType || !contentType.includes('application/json')) {
-        console.error('Expected JSON, but received: ', response)
-        alert('Unexpected response format. Please try again.')
-        return
-      }
-    
-      if (!response.ok) {
-        text = await response.text()
-        alert('An error occurred: ' + text)
-        return
-      }
-    
-      const result = await response.json()
-    
-      if (result.status == 'success') {
-
-        const newCommentDiv = `<div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
-              <div class="flex items-center">
-                <img class="w-12 h-12 rounded-full" src="${result.avatar_url}" alt="User" />
-                <p class="hover:underline cursor-pointer">${result.user}</p>
-              </div>
-              <p class="text-gray-500 text-sm mb-1">Posted ${result.created_at}</p>
-              <p class="">${result.content}</p>
-            </div>`            
-
-
-    
-        document.getElementById('commentList').insertAdjacentHTML('afterbegin', newCommentDiv)
-        form.querySelector('[name=content]').value = ''
-      } else {
-        console.error(result.error)
-      }
-    })
-  </script>
+  <script src="{% static 'blog/js/comment.js' %}"></script>
+  <script src="{% static 'blog/js/social_bar.js' %}"></script>
 {% endblock %}

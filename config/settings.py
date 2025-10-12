@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'crispy_tailwind',
     'users',
     'blog',
-    'interactions',
 ]
 
 MIDDLEWARE = [
