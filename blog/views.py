@@ -1,26 +1,76 @@
 import json
-from .models import Post, Comment
+from .models import Category, Post, Comment, Tag
+from users.models import User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
 from django.http import HttpResponse, JsonResponse
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 
 
-def index(request):
-    # return HttpResponse('index')
-    return render(request=request, template_name='index/index.html')
+def post_search(request):
+
+    # Lấy kiểu sắp xếp
+    sort = request.GET.get("sort")
+
+    if not sort:
+        sort = '-created_at'
+
+    tags = Tag.objects.all()
+    categories = Category.objects.all()
+    posts = Post.objects.all().order_by(sort)
+
+    # Tìm kiếm theo từ khóa
+    searchQuery = request.GET.get("searchQuery")
+
+    # Lấy thẻ và loại
+    selected_tag = request.GET.get("tag")
+    selected_category = request.GET.get("category")
+
+    if (not selected_tag):
+        selected_tag = 'all'
+
+    if selected_tag != 'all':
+        posts = posts.filter(tags__name__icontains=selected_tag)
+
+    if (not selected_category):
+        selected_category = 'all'
+
+    if selected_category != 'all':
+        posts = posts.filter(categories__name__icontains=selected_category)
+
+    if searchQuery:
+        posts = posts.filter(title__icontains=searchQuery)
+
+    # Phân trang
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request=request, template_name='blog/post_search.html', context={'page_obj': page_obj,
+                                                                                   'searchQuery': searchQuery,
+                                                                                   'tags': tags,
+                                                                                   'categories': categories,
+                                                                                   'selected_tag': selected_tag,
+                                                                                   'selected_category': selected_category})
 
 
-def post_list(request):
-    posts = Post.objects.all()
-    return render(request=request, template_name='blog/post_list.html', context={'posts': posts})
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["top_authors"] = User.objects.all()[:5]
+        context["top_posts"] = Post.objects.all()[5:8]
+        context["top_categories"] = Category.objects.all()[:5]
+        context["top_tags"] = Tag.objects.all()[:10]
+        return context
 
-# def post_detail(request, post_id):
-#     post = Post.objects.get(pk=post_id)
-#     return render(request=request, template_name='blog/post_detail.html', context={'post': post})
 
 class PostDetailView(DetailView):
     model = Post
@@ -60,7 +110,7 @@ def comment(request):
 
         if not content or post_id is None:
             return JsonResponse({'error': 'Missing content or post_id'}, status=400)
-        
+
         post_id = int(post_id)
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Cannot load JSON data'}, status=400)

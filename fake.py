@@ -16,7 +16,7 @@ User = get_user_model()
 
 # Tùy chỉnh
 NUMBER_OF_USERS = 20  # Số lượng người dùng (User)
-NUMBER_OF_CATEGORIES = 20  # Số lượng danh mục (Category)
+NUMBER_OF_CATEGORIES = 10  # Số lượng danh mục (Category)
 NUMBER_OF_TAGS = 30  # Số lượng thẻ/nhãn (Tag)
 NUMBER_OF_POSTS = 50  # Số lượng bài viết (Post)
 NUMBER_OF_COMMENTS = 200  # Tổng số lượng bình luận (Comment)
@@ -73,7 +73,7 @@ class Fake:
         posts = []
         categories = Category.objects.all()
         tags = Tag.objects.all()
-        users = User.objects.all().filter(is_superuser=False)
+        users = User.objects.all().filter()
         for i in range(n_posts):
             mock_post = {
                 "author": choice(users),

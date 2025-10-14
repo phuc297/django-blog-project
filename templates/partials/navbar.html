@@ -5,13 +5,15 @@
     <div class="w-6xl mx-auto flex items-center justify-between py-2 px-2 lg:px-8">
       <div class="flex items-center space-x-6">
         <a href="/" class="text-green-500 font-extrabold text-2xl">DjangoBlog</a>
-        <div class="relative hidden lg:block">
-          <input id="txtSearch" type="text" placeholder="Tìm kiếm..." class="bg-gray-100 rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500" />
-          <button id="btnSearch" class="absolute right-3 top-2 text-gray-600 hover:text-gray-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z" />
-            </svg>
-          </button>
+        <div class="relative flex items-center">
+          <form method="get" action="{% url 'blog:search' %}">
+            <input id="txtSearch" name="searchQuery" type="text" placeholder="Tìm kiếm..." value="{{ request.GET.searchQuery|default:'' }}" class="bg-gray-100 rounded-full px-4 py-2 w-64 focus:outline-none" />
+            <button id="btnSearch" onclick="" type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z" />
+              </svg>
+            </button>
+          </form>
         </div>
       </div>
 
@@ -23,7 +25,7 @@
 
       <div id="nav-content" class="hidden lg:flex items-center space-x-4">
         {% if user.is_authenticated %}
-          <button id="dropdown-profile-button"><img src="{{ user.profile.avatar.url|default:'/static/images/default-avatar.jpg' }}" alt="User" class="h-10 w-10 rounded-full" /></button>
+          <a href="{% url 'users:profile' user.profile.id %}"><img src="{{ user.profile.avatar.url|default:'/static/images/default-avatar.jpg' }}" alt="User" class="h-10 w-10 rounded-full" /></a>
         {% else %}
           <a href="" class="font-semibold border border-green-500 text-green-500 py-2 px-4 rounded-lg hover:bg-green-100 transition">Đăng kí</a>
           <a href="" class="font-semibold bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition">Đăng nhập</a>
