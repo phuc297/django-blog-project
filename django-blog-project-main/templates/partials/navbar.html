@@ -1,0 +1,71 @@
+{% load static %}
+
+<header class="bg-white w-full h-20">
+  <nav id="header" class="fixed w-full z-20 top-0">
+    <div id="progress" class="h-1 z-20 top-0" style="background:linear-gradient(to right, #4dc0b5 var(--scroll), transparent 0);"></div>
+
+    <div class="w-full md:max-w-4xl mx-auto flex flex-wrap items-center justify-between mt-0 pt-1 pb-2">
+      <div class="flex items-center justify-between">
+        <div class="pr-4">
+          <a class="text-green-500 no-underline hover:no-underline font-extrabold text-xl" href="/">DjangoBlog</a>
+        </div>
+        <div class="relative flex items-center">
+          <input id="searchInput" type="text" placeholder="Tìm kiếm..." class="bg-gray-100 rounded-full px-4 py-2 w-64 focus:outline-none" />
+          <button id="btnSearch" onclick="handleSearch()" class="absolute right-2 text-gray-600 hover:text-green-900 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="block lg:hidden pr-4">
+        <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-600 hover:text-gray-900 hover:border-green-500 appearance-none focus:outline-none">
+          <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <title>Menu</title>
+            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="w-full flex-grow lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 bg-white md:bg-transparent z-20" id="nav-content">
+        <ul class="list-reset lg:flex justify-end items-center h-12">
+          {% if user.is_authenticated %}
+            <p class="mr-4 text-gray-700">Xin chào, {{ user.username }}</p>
+              <a class="DX bg-green-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out btn" href="{% url 'users:logout' %}">Đăng xuất</a>
+               <div class="relative ml-4">
+                  <button onclick="toggleDropdown()" class="focus:outline-none">
+                      <img src="{% static 'avatars/001-cat.png' %}" class="w-10 h-10 rounded-full border" alt="User Avatar"/>
+                  </button>
+                  <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <a href="{% url 'users:hscn' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ cá nhân</a>
+                    <a href="{% url 'users:changpw' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đổi mật khẩu</a>
+                  </div>
+                </div>
+                <script>
+                  function toggleDropdown() {
+                    var menu = document.getElementById('dropdownMenu');
+                    menu.classList.toggle('hidden');
+                  }
+                  // Đóng dropdown khi click ra ngoài
+                  document.addEventListener('click', function(event) {
+                    var menu = document.getElementById('dropdownMenu');
+                    var button = event.target.closest('button');
+                    if (!event.target.closest('.relative.ml-4')) {
+                      menu.classList.add('hidden');
+                    }
+                  });
+                </script>
+          {% else %}
+          <li class="mr-2 flex flex-col justify-center">
+            <a class="w-full border border-green-500 font-semibold text-green-500 py-2 px-4 rounded-lg hover:bg-green-100 transition duration-300 ease-in-out btn" href="{% url 'users:register' %}">Đăng ký</a>
+          </li>
+          <li class="mr-2 flex flex-col justify-center">
+            <a class="w-full bg-green-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out btn" href="{% url 'users:login' %}">Đăng nhập</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

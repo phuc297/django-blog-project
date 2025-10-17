@@ -1,0 +1,34 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+  Nền tảng chia sẻ hàng đầu Việt Nam
+{% endblock %}
+
+
+
+{% block content %}
+<div class="post-list">
+    {% for post in posts %}
+      <div class="post-item">
+        <a href="{% url 'blog:detail' post.id %}" class="post-title cursor-pointer hover:underline hover:text-green-500">
+          {{ post.title }}
+        </a>
+        <p class="post-description">{{ post.description|default:"Mô tả chưa có." }}</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const posts = document.querySelectorAll(".post-item");
+    posts.forEach(post => {
+      post.classList.add("p-4", "border", "border-gray-200", "rounded-lg", "mb-4", "hover:bg-gray-50", "transition", "duration-300", "ease-in-out");
+    });
+  });
+</script>
+
+</style>
+{% endblock %}
