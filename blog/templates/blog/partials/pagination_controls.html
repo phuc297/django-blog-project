@@ -1,0 +1,17 @@
+<div class="pagination mt-4 flex justify-center items-center space-x-4 mt-6">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}
+      {% endif %}">
+      ↩ Trước
+    </a>
+  {% endif %}
+
+  <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-base font-semibold shadow">Trang {{ page_obj.number }} trên {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}
+      {% endif %}">
+      Sau ↪
+    </a>
+  {% endif %}
+</div>

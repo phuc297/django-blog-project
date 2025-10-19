@@ -1,0 +1,7 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+  {% for post in user.posts.all %}
+    <a href="">{{ post.title }}</a>
+  {% endfor %}
+{% endblock %}

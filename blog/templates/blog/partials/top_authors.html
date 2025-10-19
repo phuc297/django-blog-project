@@ -1,0 +1,15 @@
+{% load content_filters %}
+
+<h3 class="font-semibold text-lg mb-3 px-4">Người dùng nổi bật</h3>
+
+<div class="flex flex-col rounded-lg border border-gray-300 p-8 my-6">
+  {% for author in authors %}
+    <div class="w-2/3 flex py-3 font-sans">
+      <a href="{% url 'users:profile' author.profile.id %}" class="flex-shrink-0"><img src="{{ author.profile.avatar.url }}" alt="Avatar" class="w-12 h-12 rounded-full" /></a>
+      <div class="px-3">
+        <a href="{% url 'users:profile' author.profile.id %}" class="font-medium hover:underline">{{ author }}</a>
+        <p class="text-xs text-gray-500">{{ author.profile.bio|truncate_words:8 }}</p>
+      </div>
+    </div>
+  {% endfor %}
+</div>

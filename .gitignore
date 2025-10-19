@@ -218,7 +218,8 @@ __marimo__/
 staticfiles/
 mediafiles/avatars/
 mediafiles/thumbnails/
-
+*/temp.*
+temp.*
 fake.*.py
 test.py
 script.*.py

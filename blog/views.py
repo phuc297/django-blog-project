@@ -3,7 +3,7 @@ from .models import Category, Post, Comment, Tag
 from users.models import User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
@@ -49,12 +49,14 @@ def post_search(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    return render(request=request, template_name='blog/post_search.html', context={'page_obj': page_obj,
-                                                                                   'searchQuery': searchQuery,
-                                                                                   'tags': tags,
-                                                                                   'categories': categories,
-                                                                                   'selected_tag': selected_tag,
-                                                                                   'selected_category': selected_category})
+    return render(request=request,
+                  template_name='blog/post_search.html',
+                  context={'page_obj': page_obj,
+                           'searchQuery': searchQuery,
+                           'tags': tags,
+                           'categories': categories,
+                           'selected_tag': selected_tag,
+                           'selected_category': selected_category})
 
 
 class PostListView(ListView):
@@ -63,13 +65,8 @@ class PostListView(ListView):
     context_object_name = 'posts'
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["top_authors"] = User.objects.all()[:5]
-        context["top_posts"] = Post.objects.all()[5:8]
-        context["top_categories"] = Category.objects.all()[:5]
-        context["top_tags"] = Tag.objects.all()[:10]
-        return context
+    def get_queryset(self):
+        return Post.objects.all().order_by('-created_at')
 
 
 class PostDetailView(DetailView):
@@ -78,14 +75,33 @@ class PostDetailView(DetailView):
     context_object_name = 'post'
 
 
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
 
     def form_valid(self, form):
+        print(form.instance.thumbnail.url)
         form.instance.author = self.request.user
         return super().form_valid(form)
+
+
+@login_required
+def delete(request, pk):
+    post = Post.objects.get(pk=pk)
+    title = post.title
+    if post.author.id != request.user.id:
+        return JsonResponse({'thong bao': f'khong the xoa bai viet {title}'}, status=405)
+    post.delete()
+    return JsonResponse({'thong bao': f'xoa bai viet {title}'}, status=405)
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -96,6 +112,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+
+
+def user_posts(request):
+    return render(request, 'blog/user_post_list.html')
 
 
 @login_required

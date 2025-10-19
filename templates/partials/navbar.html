@@ -24,12 +24,42 @@
       </button>
 
       <div id="nav-content" class="hidden lg:flex items-center space-x-4">
-        {% if user.is_authenticated %}
-          <a href="{% url 'users:profile' user.profile.id %}"><img src="{{ user.profile.avatar.url|default:'/static/images/default-avatar.jpg' }}" alt="User" class="h-10 w-10 rounded-full" /></a>
-        {% else %}
-          <a href="" class="font-semibold border border-green-500 text-green-500 py-2 px-4 rounded-lg hover:bg-green-100 transition">Đăng kí</a>
-          <a href="" class="font-semibold bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition">Đăng nhập</a>
-        {% endif %}
+        <ul class="list-reset lg:flex justify-end items-center h-12">
+          {% if user.is_authenticated %}
+            <p class="mr-4 text-gray-700">Xin chào, {{ user.username }}</p>
+            <a class="DX bg-green-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out btn" href="{% url 'blog:create' %}">Đăng bài</a>
+            <div class="relative ml-4">
+              <button onclick="toggleDropdown()" class="focus:outline-none"><img src="{{ user.profile.avatar.url }}" class="w-10 h-10 rounded-full border" alt="User Avatar" /></button>
+              <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <a href="{% url 'users:profile' user.profile.id %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ cá nhân</a>
+                <a href="" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Quản lý bài viết</a>
+                <a href="" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đổi mật khẩu</a>
+                <a href="{% url 'users:logout' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+              </div>
+            </div>
+            <script>
+              function toggleDropdown() {
+                var menu = document.getElementById('dropdownMenu')
+                menu.classList.toggle('hidden')
+              }
+              // Đóng dropdown khi click ra ngoài
+              document.addEventListener('click', function (event) {
+                var menu = document.getElementById('dropdownMenu')
+                var button = event.target.closest('button')
+                if (!event.target.closest('.relative.ml-4')) {
+                  menu.classList.add('hidden')
+                }
+              })
+            </script>
+          {% else %}
+            <li class="mr-2 flex flex-col justify-center">
+              <a class="w-full border border-green-500 font-semibold text-green-500 py-2 px-4 rounded-lg hover:bg-green-100 transition duration-300 ease-in-out btn" href="{% url 'users:register' %}">Đăng ký</a>
+            </li>
+            <li class="mr-2 flex flex-col justify-center">
+              <a class="w-full bg-green-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out btn" href="{% url 'users:login' %}">Đăng nhập</a>
+            </li>
+          {% endif %}
+        </ul>
       </div>
     </div>
   </nav>

@@ -1,0 +1,8 @@
+<h3 class="font-semibold text-lg mb-3 px-4">Danh mục</h3>
+<div class="space-y-2 px-8">
+  {% for cat in categories %}
+    <div>
+      <a href="#" class="text-gray-700 text-xl">{{ cat.name }}</a>
+    </div>
+  {% endfor %}
+</div>

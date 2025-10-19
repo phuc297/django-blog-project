@@ -1,4 +1,4 @@
-(() => {
+(function initSocialBar() {
     document.addEventListener('DOMContentLoaded', function () {
         const stickyBar = document.getElementById('sticky-bar')
 
