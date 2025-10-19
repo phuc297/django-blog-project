@@ -13,7 +13,8 @@ class ProfileView(DetailView):
     template_name = 'users/profile.html'
     context_object_name = 'profile'
     
-    
+
+# Trang chỉnh sửa profile
 # class ProfileUpdateView(UpdateView):
 #     model = Profile
 #     template_name = 'users/profile_forms.html'

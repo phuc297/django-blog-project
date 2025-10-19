@@ -59,6 +59,7 @@ def post_search(request):
                            'selected_category': selected_category})
 
 
+# View hiển thị danh sách bài viết
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
@@ -69,20 +70,14 @@ class PostListView(ListView):
         return Post.objects.all().order_by('-created_at')
 
 
+# View hiển thị chi tiết bài viết
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
 
 
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Post
-
-    def test_func(self):
-        post = self.get_object()
-        return post.author == self.request.user
-
-
+# View tạo bài viết mới
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
@@ -94,16 +89,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-@login_required
-def delete(request, pk):
-    post = Post.objects.get(pk=pk)
-    title = post.title
-    if post.author.id != request.user.id:
-        return JsonResponse({'thong bao': f'khong the xoa bai viet {title}'}, status=405)
-    post.delete()
-    return JsonResponse({'thong bao': f'xoa bai viet {title}'}, status=405)
-
-
+# View cập nhật bài viết
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
@@ -114,10 +100,32 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return post.author == self.request.user
 
 
+# View xóa bài viết
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+
+# API xóa bài viết
+@login_required
+def delete(request, pk):
+    post = Post.objects.get(pk=pk)
+    title = post.title
+    if post.author.id != request.user.id:
+        return JsonResponse({'thong bao': f'khong the xoa bai viet {title}'})
+    post.delete()
+    return JsonResponse({'thong bao': f'đã xóa bài viết {title}'})
+
+
+# View hiển thị danh sách bài viết của user
 def user_posts(request):
     return render(request, 'blog/user_post_list.html')
 
 
+# API bình luận vào bài viết
 @login_required
 def comment(request):
     if request.method != "POST":
