@@ -1,11 +1,15 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-  {% for post in user.posts.all %}
-    <span>
-      <a href="{% url 'blog:detail' post.id %}" class="hover:underline font-bold">{{ post.title }}</a>
-      <a href="{% url 'blog:update' post.id %}" class="hover:underline">Cập nhật</a>
-      <a href="{% url 'blog:delete' post.id %}" class="hover:underline">Xóa</a>
-    </span>
-  {% endfor %}
+  {% if user.posts.all.count != 0 %}
+    {% for post in user.posts.all %}
+      <span>
+        <a href="{% url 'blog:detail' post.id %}" class="hover:underline font-bold">{{ post.title }}</a>
+        <a href="{% url 'blog:update' post.id %}" class="hover:underline">Cập nhật</a>
+        <a href="{% url 'blog:delete' post.id %}" class="hover:underline">Xóa</a>
+      </span>
+    {% endfor %}
+  {% else %}
+      <p>Không có bài viết</p>
+  {% endif %}
 {% endblock %}
