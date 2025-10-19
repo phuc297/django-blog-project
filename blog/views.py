@@ -117,7 +117,7 @@ def delete(request, pk):
     if post.author.id != request.user.id:
         return JsonResponse({'thong bao': f'khong the xoa bai viet {title}'})
     post.delete()
-    return JsonResponse({'thong bao': f'đã xóa bài viết {title}'})
+    return JsonResponse({'thong bao': f'da xoa bai viet {title}'})
 
 
 # View hiển thị danh sách bài viết của user
