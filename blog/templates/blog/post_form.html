@@ -2,6 +2,9 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block head%}
+{% endblock%}
+
 {% block title %}
 
 
@@ -14,4 +17,7 @@
     {{ form|crispy }}
     <button type="submit" class="btn btn-primary">Lưu</button>
   </form>
+{% endblock %}
+
+{% block script %}
 {% endblock %}
