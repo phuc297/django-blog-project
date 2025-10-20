@@ -3,7 +3,7 @@ from .models import Category, Post, Comment, Tag
 from users.models import User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
@@ -65,45 +65,47 @@ def post_search(request):
     page_number = (request.GET.get("page") or "1").strip()
     page_obj = paginator.get_page(page_number)
 
-    return render(request=request, template_name='blog/post_search.html', context={'page_obj': page_obj,
-                                                                                   'searchQuery': searchQuery,
-                                                                                   'tags': tags,
-                                                                                   'categories': categories,
-                                                                                   'selected_tag': selected_tag,
-                                                                                   'selected_category': selected_category})
+    return render(request=request,
+                  template_name='blog/post_search.html',
+                  context={'page_obj': page_obj,
+                           'searchQuery': searchQuery,
+                           'tags': tags,
+                           'categories': categories,
+                           'selected_tag': selected_tag,
+                           'selected_category': selected_category})
 
 
+# View hiển thị danh sách bài viết
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["top_authors"] = User.objects.all()[:5]
-        context["top_posts"] = Post.objects.all()[5:8]
-        context["top_categories"] = Category.objects.all()[:5]
-        context["top_tags"] = Tag.objects.all()[:10]
-        return context
+    def get_queryset(self):
+        return Post.objects.all().order_by('-created_at')
 
 
+# View hiển thị chi tiết bài viết
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
 
 
+# View tạo bài viết mới
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
 
     def form_valid(self, form):
+        print(form.instance.thumbnail.url)
         form.instance.author = self.request.user
         return super().form_valid(form)
 
 
+# View cập nhật bài viết
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
@@ -113,6 +115,34 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return post.author == self.request.user
     
+
+
+# View xóa bài viết
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+
+# API xóa bài viết
+@login_required
+def delete(request, pk):
+    post = Post.objects.get(pk=pk)
+    title = post.title
+    if post.author.id != request.user.id:
+        return JsonResponse({'thong bao': f'khong the xoa bai viet {title}'})
+    post.delete()
+    return JsonResponse({'thong bao': f'da xoa bai viet {title}'})
+
+
+# View hiển thị danh sách bài viết của user
+def user_posts(request):
+    return render(request, 'blog/user_post_list.html')
+
+
+# API bình luận vào bài viết
 @login_required
 def comment(request):
     if request.method != "POST":

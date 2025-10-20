@@ -1,0 +1,12 @@
+{% load content_filters %}
+
+<h3 class="font-semibold text-lg mb-3 px-4">Bài viết nổi bật</h3>
+
+{% for post in posts %}
+  <div class="rounded-lg border border-gray-300 p-8 my-6">
+    <a href="{% url 'blog:detail' post.id %}">
+      <h3 class="text-xl font-semibold">{{ post.title }}</h3>
+      <p>{{ post.description|truncate_words:10 }}</p>
+    </a>
+  </div>
+{% endfor %}

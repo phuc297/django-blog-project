@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+
 from .utils import get_random_thumbnail
 
 
@@ -23,7 +24,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=300, blank=True)
     thumbnail = models.ImageField(
-        upload_to='thumnails/', default=get_random_thumbnail)
+        upload_to='thumbnails/', default=get_random_thumbnail)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -33,8 +34,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
     def get_absolute_url(self):
         return reverse("blog:detail", kwargs={"pk": self.pk})
+    
 
 
 class Comment(models.Model):

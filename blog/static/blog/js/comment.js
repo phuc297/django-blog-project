@@ -1,4 +1,4 @@
-(() => {
+(function initCommentForm() {
     form = document.getElementById('commentForm')
     form.addEventListener('submit', async (e) => {
         e.preventDefault()

@@ -2,8 +2,35 @@
   
 **project settings folder**: config
 
-**apps folders**: users, blog, interactions
+**apps folders**: users, blog
 
+
+# 1 Tạo môi trường
+
+
+```
+python -m venv venv
+```
+
+```
+.\venv\Scripts\activate
+```
+
+```
+python -m pip install --upgrade pip
+```
+
+```
+pip install -r .\requirements.txt
+```
+
+```
+python .\manage.py makemigrations
+```
+
+```
+python .\manage.py migrate
+```
 
 # 2 Sinh dữ liệu ngẫu nhiên
 vào file **`fake.py`** để tùy chỉnh:
@@ -34,28 +61,7 @@ exit()
 ```
 
 
-# 1 Tạo môi trường
 
-
-```
-python -m venv venv
-```
-
-```
-.\venv\Scripts\activate
-```
-
-```
-python -m pip install --upgrade pip
-```
-
-```
-pip install -r .\requirements.txt
-```
-
-```
-python .\manage.py migrate
-```
 
 
 
