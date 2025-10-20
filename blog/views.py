@@ -8,26 +8,42 @@ from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 
 def post_search(request):
 
     # Lấy kiểu sắp xếp
-    sort = request.GET.get("sort")
+    sort = (request.GET.get("sort") or "-created_at").strip()
 
     if not sort:
         sort = '-created_at'
+    else:
+        allowed_sorts = ["created_at", "-created_at", "like", "comment"]
+        if sort not in allowed_sorts:
+            sort = "-created_at"
 
     tags = Tag.objects.all()
     categories = Category.objects.all()
-    posts = Post.objects.all().order_by(sort)
+
+    match sort:
+        case "like":
+            posts = Post.objects.annotate(
+                num_likes=Count('like')
+            ).order_by('-num_likes')
+        case "comment":
+            posts = Post.objects.annotate(
+                num_cmts=Count('comments')
+            ).order_by('-num_cmts')
+        case _:
+            posts = Post.objects.all().order_by(sort)
 
     # Tìm kiếm theo từ khóa
-    searchQuery = request.GET.get("searchQuery")
+    searchQuery = (request.GET.get("searchQuery") or "").strip()
 
-    # Lấy thẻ và loại
-    selected_tag = request.GET.get("tag")
-    selected_category = request.GET.get("category")
+    # Lấy thẻ và loại 
+    selected_tag = (request.GET.get("tag") or "all").strip()
+    selected_category = (request.GET.get("category") or "all").strip()
 
     if (not selected_tag):
         selected_tag = 'all'
@@ -46,7 +62,7 @@ def post_search(request):
 
     # Phân trang
     paginator = Paginator(posts, 10)
-    page_number = request.GET.get("page")
+    page_number = (request.GET.get("page") or "1").strip()
     page_obj = paginator.get_page(page_number)
 
     return render(request=request,
@@ -98,6 +114,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+    
 
 
 # View xóa bài viết

@@ -18,6 +18,44 @@
     </div>
 
     <div id="accordion" class="hidden flex flex-col items-left mt-2 space-y-4">
+      <!-- Sắp xếp -->
+      <div id="divSort">
+        <form method="get" action="{% url 'blog:search' %}">
+          <input type="hidden" name="searchQuery" value="{{ request.GET.searchQuery }}">
+          <input type="hidden" name="category" value="{{ request.GET.category }}">
+          <input type="hidden" name="tag" value="{{ request.GET.tag }}">
+          <label class="flex font-medium text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+              class="h-6 w-5 mr-1" 
+              viewBox="0 0 20 20" 
+              fill="currentColor">
+              <path fill-rule="evenodd" 
+                    d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h4a1 1 0 110 2H4a1 1 0 01-1-1z" 
+                    clip-rule="evenodd" />
+            </svg>
+            Sắp xếp theo:
+          </label>
+          <hr class="my-1">
+          <div class="flex space-x-15 mt-2 text-sm text-gray-800">
+            <label class="flex items-center space-x-2">
+              <input class="sortRadio" type="radio" name="sort" value="-created_at" {% if request.GET.sort == "-created_at" or not request.GET.sort %}checked{% endif %}>
+              <span>Mới nhất</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input class="sortRadio" type="radio" name="sort" value="created_at" {% if request.GET.sort == "created_at" %}checked{% endif %}>
+              <span>Cũ nhất</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input class="sortRadio" type="radio" name="sort" value="like" {% if request.GET.sort == "like" %}checked{% endif %}>
+              <span>Lượt thích</span>
+            </label>
+              <label class="flex items-center space-x-2">
+              <input class="sortRadio" type="radio" name="sort" value="comment" {% if request.GET.sort == "comment" %}checked{% endif %}>
+              <span>Bình luận</span>
+            </label>
+          </div>
+        </form>
+      </div>
       <!-- Lọc -->
       <div id="divFilter">
         <label class="flex font-medium text-gray-700">
@@ -30,103 +68,17 @@
         <hr class="mb-3 mt-1" />
         <div id="divCategory" class="flex flex-wrap gap-2">
           <label class="font-semibold text-sm ml-1">Loại:</label>
-          <a href="?category=all{% if request.GET.searchQuery %}
-              
-              
-              
-              
-              
-              
-              
-              &searchQuery={{ request.GET.searchQuery }}
-            {% endif %}{% if request.GET.sort %}
-              
-              
-              
-              
-              
-              
-              
-              &sort={{ request.GET.sort }}
-            {% endif %}{% if request.GET.tag %}
-              
-              
-              
-              
-              
-              
-              
-              &tag={{ request.GET.tag }}
-            {% endif %}"
+            <a href="?category=all{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery}}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort}}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag}}{% endif %}"
             class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
                     {% if selected_category == 'all' %}
-              
-              
-              
-              
-              
-              
-              
-              
                       bg-green-600 text-white
-
-
-
-
-
-
-
-
-            {% else %}
-              
-              
-              
-              
-              
-              
-              
-              
+                    {% else %}
                       bg-gray-200 hover:bg-gray-300
-
-
-
-
-
-
-
-
-            {% endif %}">
+                    {% endif %}">
             Tất cả
           </a>
           {% for cat in categories %}
-            <a href="?category={{ cat.name }}{% if request.GET.searchQuery %}
-                
-                
-                
-                
-                
-                
-                
-                &searchQuery={{ request.GET.searchQuery }}
-              {% endif %}{% if request.GET.sort %}
-                
-                
-                
-                
-                
-                
-                
-                &sort={{ request.GET.sort }}
-              {% endif %}{% if request.GET.tag %}
-                
-                
-                
-                
-                
-                
-                
-                &tag={{ request.GET.tag }}
-              {% endif %}"
+            <a href="?category={{ cat.name }}{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %} &sort={{ request.GET.sort }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
               class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
                       {% if cat.name == selected_category %}
                 
@@ -167,34 +119,7 @@
         <hr class="ml-4 mr-4 mt-2 mb-3 border-gray-400" />
         <div id="divTag" class="flex flex-wrap gap-2">
           <label class="font-semibold text-sm ml-1">Thẻ:</label>
-          <a href="?tag=all{% if request.GET.searchQuery %}
-              
-              
-              
-              
-              
-              
-              
-              &searchQuery={{ request.GET.searchQuery }}
-            {% endif %}{% if request.GET.sort %}
-              
-              
-              
-              
-              
-              
-              
-              &sort={{ request.GET.sort }}
-            {% endif %}{% if request.GET.category %}
-              
-              
-              
-              
-              
-              
-              
-              &category={{ request.GET.category }}
-            {% endif %}"
+          <a href="?tag=all{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
             class="px-3 py-1 rounded-full text-sm cursor-pointer {% if selected_tag == 'all' %}
               
               
@@ -227,34 +152,7 @@
             Tất cả
           </a>
           {% for tag in tags %}
-            <a href="?tag={{ tag.name }}{% if request.GET.searchQuery %}
-                
-                
-                
-                
-                
-                
-                
-                &searchQuery={{ request.GET.searchQuery }}
-              {% endif %}{% if request.GET.sort %}
-                
-                
-                
-                
-                
-                
-                
-                &sort={{ request.GET.sort }}
-              {% endif %}{% if request.GET.category %}
-                
-                
-                
-                
-                
-                
-                
-                &category={{ request.GET.category }}
-              {% endif %}"
+            <a href="?tag={{ tag.name }}{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
               class="px-3 py-1 rounded-full text-sm cursor-pointer {% if tag.name == selected_tag %}
                 
                 
@@ -333,16 +231,7 @@
       <!-- Pagination controls -->
       <div class="pagination mt-4 flex justify-center items-center space-x-4 mt-6">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}
-              
-              
-              
-              
-              
-              
-              
-              &searchQuery={{ searchQuery }}
-            {% endif %}">
+          <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
             ↩ Trước
           </a>
         {% endif %}
@@ -350,16 +239,7 @@
         <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-base font-semibold shadow">Trang {{ page_obj.number }} trên {{ page_obj.paginator.num_pages }}</span>
 
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}
-              
-              
-              
-              
-              
-              
-              
-              &searchQuery={{ searchQuery }}
-            {% endif %}">
+          <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
             Sau ↪
           </a>
         {% endif %}
