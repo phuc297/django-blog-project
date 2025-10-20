@@ -1,0 +1,36 @@
+{% load content_filters %}
+
+{% if page_obj.object_list %}
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    {% for post in page_obj %}
+      <div class="bg-white rounded-lg shadow-sm h-full flex flex-col">
+        <a href="{% url 'blog:detail' post.id %}"><img src="{{ post.thumbnail.url }}" alt="Thumbnail" class="rounded-t-lg w-full h-48 object-cover cursor-pointer" /></a>
+
+        <div class="p-4 flex flex-col justify-between h-full">
+          <div>
+            <a href="{% url 'blog:detail' post.id %}"><h3 class="font-semibold hover:text-green-600">{{ post.title }}</h3></a>
+            <p class="text-sm italic text-gray-700">{{ post.description|truncate_words:10 }}</p>
+          </div>
+
+          <div class="text-xs text-gray-500 mt-3">
+            <span>{{ post.created_at }}</span>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="pagination pt-8 m-auto text-center">
+    {% if page_obj.has_previous %}
+      <button type="button" data-page="{{ page_obj.previous_page_number }}" class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">← Trước</button>
+    {% endif %}
+
+    <span class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200">Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <button type="button" data-page="{{ page_obj.next_page_number }}" class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">Tiếp →</button>
+    {% endif %}
+  </div>
+{% else %}
+  <p class="text-gray-600">No posts available.</p>
+{% endif %}

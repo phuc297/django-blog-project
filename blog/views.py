@@ -1,6 +1,6 @@
 import json
 from .models import Category, Post, Comment, Tag
-from users.models import User
+from users.models import Profile, User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
@@ -41,7 +41,7 @@ def post_search(request):
     # Tìm kiếm theo từ khóa
     searchQuery = (request.GET.get("searchQuery") or "").strip()
 
-    # Lấy thẻ và loại 
+    # Lấy thẻ và loại
     selected_tag = (request.GET.get("tag") or "all").strip()
     selected_category = (request.GET.get("category") or "all").strip()
 
@@ -91,6 +91,20 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        obj = self.get_object()
+        is_following = False
+        if self.request.user.is_authenticated and self.request.user.id != obj.author.id:
+            try:
+                is_following = obj.author.profile in self.request.user.profile.following.all()
+            except Profile.DoesNotExist:
+                pass
+            
+        context["is_following"] = is_following
+        return context
+    
 
 
 # View tạo bài viết mới
@@ -114,7 +128,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
-    
 
 
 # View xóa bài viết
@@ -152,15 +165,7 @@ def comment(request):
         data = json.loads(request.body)
         content = data.get('content')
         post_id = data.get('post_id')
-
-        if not content or post_id is None:
-            return JsonResponse({'error': 'Missing content or post_id'}, status=400)
-
         post_id = int(post_id)
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Cannot load JSON data'}, status=400)
-    except (TypeError, ValueError):
-        return JsonResponse({'error': 'Invalid post_id'}, status=400)
     except Exception as e:
         print(f"Unexpected error: {e}")
         return JsonResponse({'error': 'Something went wrong'}, status=500)

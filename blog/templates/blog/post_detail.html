@@ -40,7 +40,13 @@
           <p class="text-sm text-gray-600">Published {{ post.created_at }}</p>
         </div>
         <div id="following-status">
-          <button id="btn-follow" class="border p-2 w-28 border-gray-200 text-gray-300">+ Follow</button>
+          {% if not user.id == post.author.id %}
+            {% if is_following %}
+              <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-green-500 text-green-500">Đang theo dõi</button>
+            {% else %}
+              <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-gray-500 text-gray-500">Theo dõi</button>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
 
@@ -65,8 +71,10 @@
           {% for comment in post.comments.all %}
             <div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
               <div class="flex items-center">
-                <img class="w-12 h-12 rounded-full" src="{{ comment.user.profile.avatar.url }}" alt="User" />
-                <p class="hover:underline cursor-pointer">{{ comment.user }}</p>
+                <a href="{% url 'users:profile' comment.user.profile.id %}" class="flex items-center">
+                  <img class="w-12 h-12 rounded-full" src="{{ comment.user.profile.avatar.url }}" alt="User" />
+                  <p class="hover:underline cursor-pointer">{{ comment.user }}</p>
+                </a>
               </div>
               <p class="text-gray-500 text-sm mb-1">Posted {{ comment.created_at }}</p>
               <p class="">{{ comment.content }}</p>
@@ -81,4 +89,5 @@
 {% block script %}
   <script src="{% static 'blog/js/comment.js' %}"></script>
   <script src="{% static 'blog/js/social_bar.js' %}"></script>
+  <script type="module" src="{% static 'blog/js/follow.js' %}"></script>
 {% endblock %}

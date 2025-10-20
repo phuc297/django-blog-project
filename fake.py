@@ -18,8 +18,8 @@ User = get_user_model()
 NUMBER_OF_USERS = 20  # Số lượng người dùng (User)
 NUMBER_OF_CATEGORIES = 10  # Số lượng danh mục (Category)
 NUMBER_OF_TAGS = 30  # Số lượng thẻ/nhãn (Tag)
-NUMBER_OF_POSTS = 50  # Số lượng bài viết (Post)
-NUMBER_OF_COMMENTS = 200  # Tổng số lượng bình luận (Comment)
+NUMBER_OF_POSTS = 100  # Số lượng bài viết (Post)
+NUMBER_OF_COMMENTS = 5 * NUMBER_OF_POSTS  # Tổng số lượng bình luận (Comment)
 MIN_FOLLOWERS_PER_USER = 2
 MAX_FOLLOWERS_PER_USER = 5
 
