@@ -23,7 +23,13 @@
           <p class="text-sm text-gray-600">Published {{ post.created_at }}</p>
         </div>
         <div id="following-status">
-          <button id="btn-follow" class="border p-2 w-28 border-gray-200 text-gray-300">+ Follow</button>
+          {% if not user.id == post.author.id %}
+            {% if is_following %}
+              <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-green-500 text-green-500">Đang theo dõi</button>
+            {% else %}
+              <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-gray-500 text-gray-500">Theo dõi</button>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
 
@@ -118,4 +124,5 @@
 {% block script %}
   <script src="{% static 'blog/js/comment.js' %}"></script>
   <script src="{% static 'blog/js/like.js' %}"></script>
+  <script type="module" src="{% static 'blog/js/follow.js' %}"></script>
 {% endblock %}
