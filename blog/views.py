@@ -1,5 +1,5 @@
 import json
-from .models import Category, Post, Comment, Tag
+from .models import Category, Post, Comment, Tag, Like
 from users.models import User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -91,6 +91,15 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        # Đếm số like và số bình luận
+        context['like_count'] = post.like_set.count()
+        context['comment_count'] = post.comments.count()
+        if self.request.user.is_authenticated:
+            context['user_liked'] = post.like_set.filter(user=self.request.user).exists()
+        return context
 
 
 # View tạo bài viết mới
@@ -141,6 +150,37 @@ def delete(request, pk):
 def user_posts(request):
     return render(request, 'blog/user_post_list.html')
 
+#API thích bài viết
+@login_required
+def like(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        # Kiểm tra user đã like chưa
+        liked = Like.objects.filter(post=post, user=user).exists()
+
+        if liked:
+            # Nếu đã like → bỏ like
+            Like.objects.filter(post=post, user=user).delete()  
+            liked = False
+        else:
+            # Nếu chưa like → thêm like
+            Like.objects.create(post=post, user=user)
+            liked = True
+
+        # Đếm lại tổng số like hiện tại
+        like_count = post.like_set.count()
+
+        return JsonResponse({
+            'status': 'success',
+            'liked': liked,
+            'like_count': like_count
+        })
+    else:
+        return JsonResponse({'error': 'Request không hợp lệ'}, status=400)
 
 # API bình luận vào bài viết
 @login_required

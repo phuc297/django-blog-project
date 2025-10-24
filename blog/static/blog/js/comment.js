@@ -1,3 +1,4 @@
+
 (function initCommentForm() {
     form = document.getElementById('commentForm')
     form.addEventListener('submit', async (e) => {
@@ -43,7 +44,6 @@
         const result = await response.json()
 
         if (result.status == 'success') {
-
             const newCommentDiv = `<div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
               <div class="flex items-center">
                 <img class="w-12 h-12 rounded-full" src="${result.avatar_url}" alt="User" />
@@ -53,7 +53,12 @@
               <p class="">${result.content}</p>
             </div>`
 
-
+            const cmtElem = document.getElementById("comment-count");
+            const currentText = cmtElem.textContent.trim();
+            const currentCount = parseInt(currentText.replace(/[^\d]/g, "")) || 0;
+            const newCount = currentCount + 1;
+            console.log(newCount);
+            cmtElem.textContent = ` (${newCount})`;
 
             document.getElementById('commentList').insertAdjacentHTML('afterbegin', newCommentDiv)
             form.querySelector('[name=content]').value = ''
