@@ -15,7 +15,16 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-# class ProfileForm(forms.ModelForm):
-#     class Meta:
-#         model = Profile
-        
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['avatar', 'bio']
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3}),
+        }

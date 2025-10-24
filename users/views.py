@@ -12,6 +12,16 @@ from .models import Profile, User
 from django.db.models import Count
 from django.core.paginator import Paginator
 
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.views.generic import DetailView, UpdateView
+from users.forms import RegisterForm, LoginForm, UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth import login, authenticate, logout
+from .models import Profile
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect
+
 
 class ProfileView(DetailView):
     model = Profile
@@ -23,14 +33,14 @@ class ProfileView(DetailView):
         obj = self.get_object()
         paginator = Paginator(obj.user.posts.all(), 9)
         page_obj = paginator.get_page('1')
-        
+
         is_following = False
         if self.request.user.is_authenticated and self.request.user.id != obj.id:
             try:
                 is_following = obj in self.request.user.profile.following.all()
             except Profile.DoesNotExist:
                 pass
-        
+
         context['page_obj'] = page_obj
         context['is_following'] = is_following
         return context
@@ -115,3 +125,66 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("users:login")
+
+
+def edit_profile_view(request):
+    user = request.user
+    if not user.is_authenticated:
+        return redirect('users:login')
+
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=user.profile)
+        password_form = PasswordChangeForm(user, request.POST)
+
+        # Which submit button was pressed?
+        if 'password_submit' in request.POST:
+            if password_form.is_valid():
+                user_obj = password_form.save()
+                update_session_auth_hash(request, user_obj)
+                return redirect('users:password_change_done')
+        elif 'profile_submit' in request.POST:
+            print(request.POST)
+            print('thay doi profile')
+            valid_profile = profile_form.is_valid()
+            if valid_profile:
+                profile_form.save()
+                return redirect('users:profile', pk=user.pk)
+        elif 'user_submit' in request.POST:
+            print(request.POST)
+            print('thay doi user')
+            valid_user = user_form.is_valid()
+            if valid_user:
+                user_form.save()
+                return redirect('users:profile', pk=user.pk)
+
+    else:
+        user_form = UserUpdateForm(instance=user)
+        profile_form = ProfileUpdateForm(instance=user.profile)
+        password_form = PasswordChangeForm(user)
+
+    return render(request, 'users/edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'profile': user.profile,
+    })
+
+
+def change_password(request):
+    if request.method == 'POST':
+        # Form này yêu cầu request.user
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()  # Tự động gọi set_password và save
+
+            # Quan trọng: Cập nhật session để người dùng không bị logout
+            update_session_auth_hash(request, user)
+
+            print("Đổi mật khẩu thành công!")
+            return redirect('profile')  # Chuyển hướng về trang profile
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, 'change_password.html', {'form': form})

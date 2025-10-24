@@ -33,7 +33,7 @@
               <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <a href="{% url 'users:profile' user.profile.id %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ cá nhân</a>
                 <a href="{% url 'blog:user_posts' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Quản lý bài viết</a>
-                <a href="" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Tùy chỉnh hồ sơ</a>
+                <a href="{% url 'users:edit_profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Tùy chỉnh hồ sơ</a>
                 <a href="{% url 'users:logout' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</a>
               </div>
             </div>
