@@ -215,11 +215,12 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+.vscode/
 staticfiles/
 mediafiles/avatars/
 mediafiles/thumbnails/
 */temp.*
 temp.*
 fake.*.py
-test.py
+test.*
 script.*.py

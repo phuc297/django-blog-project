@@ -12,23 +12,6 @@
 
 {% block content %}
   <div class="w-full m-auto">
-    <div id="sticky-bar" class="fixed top-1/2 left-1/6 -translate-y-1/2 w-20 text-gray-500">
-      <div class="flex flex-col items-center space-y-2">
-        <button id="like" class="flex justify-center items-center h-8 w-8 rounded-full border cursor-pointer transition border-gray-500 hover:text-green-500 hover:border-green-500">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8.39 18.49V8.33c0-.4.12-.79.34-1.12l2.73-4.06c.43-.65 1.5-1.11 2.44-.77.98.33 1.63 1.43 1.42 2.41l-.52 3.27c-.04.3.03.57.2.78.17.19.43.3.7.3h4.11c.79 0 1.47.32 1.85.86.38.54.45 1.25.21 1.93l-2.46 7.49c-.31 1.25-1.66 2.22-3.01 2.22h-3.9c-.67 0-1.61-.23-2.04-.66l-1.28-.99c-.49-.37-.79-.96-.79-1.58Z" />
-            <path d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46v10.06c0 1.48.63 2.08 2.18 2.08h1.03c1.55 0 2.18-.6 2.18-2.08V8.46c0-1.48-.63-2.08-2.18-2.08Z" />
-          </svg>
-        </button>
-
-        <button id="comment" onclick="scrollToComment()" class="flex justify-center items-center h-8 w-8 rounded-full border cursor-pointer transition border-gray-500 hover:text-green-500 hover:border-green-500">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M14 3.5v6A1.5 1.5 0 0 1 12.5 11H8.75L3.5 14l.75-3H3.5A1.5 1.5 0 0 1 2 9.5v-6A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5Z" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
     <div class="w-1/2 m-auto mt-10">
       <p class="text-gray-500 hover:underline cursor-pointer text-xl">{{ post.categories.first }}</p>
       <h1 class="font-bold text-3xl md:text-4xl pt-4 pb-2">{{ post.title }}</h1>
@@ -53,33 +36,85 @@
       <article class="text-justify text-xl/8">{{ post.content }}</article>
     </div>
 
-    <div class="border-t-1 border-gray-200 mt-8 mx-16">
-      <div class="m-auto w-1/2 mx-auto pt-8 mb-16">
-        <h1 class="text-4xl">Bình luận</h1>
+    <div class="mt-8 mx-16">
+      <div class="m-auto w-1/2 mx-auto pt-8 mb-16 space-y-5">
+        <div class="flex justify-between py-1 mx-16">
+          <div class="flex space-x-8">
+            <div class="flex pt-2 text-gray-500 justify-center items-center">
+              <button id="likeButton" type="button" aria-label="Like" class="flex justify-center items-center cursor-pointer h-8 w-8 transition {% if user_liked %}text-green-500{% endif %}">
+                <svg width="24" height="24" viewBox="0 0 20.00 20.00" fill="currentColor">
+                  <path fill="currentColor" d="M1.36086471,9.49461632 L1.36086471,16.6522169 L4.38924934,16.6522169 L4.54295141,16.669915 C7.35632613,17.3264467 9.219553,17.7987199 10.1492205,18.0919596 C11.3826979,18.4810282 11.8431033,18.575637 12.6802647,18.6322585 C13.3063982,18.674607 14.0169996,18.4335226 14.3413428,18.103732 C14.5196863,17.9223933 14.6542622,17.5483534 14.7069375,16.9681973 C14.7294857,16.7198551 14.8853604,16.5037105 15.1133359,16.4046624 C15.3618479,16.2966919 15.5685557,16.1212587 15.7419902,15.865589 C15.9011699,15.6309331 16.0058214,15.1954671 16.0246237,14.5640487 C16.0316554,14.3279089 16.1600195,14.1122725 16.363849,13.9941906 C16.9457511,13.6570847 17.2347296,13.2769776 17.2943246,12.8312056 C17.3602481,12.338096 17.1995661,11.7826785 16.7806277,11.1512656 C16.5760317,10.8429039 16.6543442,10.4269441 16.9569335,10.21481 C17.3582156,9.93348616 17.5779653,9.5409083 17.6332748,8.9851434 C17.7214317,8.09931968 17.156275,7.44351055 15.8773623,7.31252406 C14.7624423,7.19833374 13.6323013,7.29247162 12.4832786,7.59641559 C11.9250699,7.74407516 11.4496765,7.16931529 11.6968787,6.64564266 C12.1963307,5.58760445 12.4752151,4.71453762 12.5396762,4.03901467 C12.6253087,3.14162377 12.4181163,2.49152051 11.9338786,1.95581546 C11.5672119,1.55017735 10.9799973,1.31763269 10.7600333,1.36531558 C10.4696082,1.42827276 10.281031,1.59684713 10.0352097,2.18427466 C9.88970681,2.53197598 9.81997894,2.8282418 9.69972942,3.51866179 C9.58547121,4.17468235 9.52195796,4.4707247 9.39107836,4.85968417 C8.99574015,6.03458495 8.02731995,7.25370081 6.7256191,8.09546562 C5.82090012,8.68051601 4.84158756,9.13691545 3.78933455,9.46424884 C3.7242644,9.48449077 3.65652971,9.49478472 3.58840697,9.49478472 L1.36086471,9.49461632 Z M1.31780294,18.0148644 C0.99539565,18.0236275 0.704687342,17.9522771 0.46234885,17.7821144 C0.152432695,17.5645007 0.00594373202,17.2231922 0.00323506505,16.8290895 L0.00584690603,9.50610364 C-0.0283631088,9.11574509 0.0873204717,8.75762347 0.358889377,8.49174573 C0.613590006,8.24238276 0.946645163,8.12370393 1.29943013,8.13188763 L3.48409667,8.13188763 C4.38260664,7.84342441 5.21754484,7.44949057 5.99039908,6.94971253 C7.03799965,6.27226556 7.80960035,5.30092001 8.10483191,4.42352493 C8.20639643,4.12168658 8.25987737,3.87240596 8.36237135,3.28393051 C8.49972371,2.49531346 8.5861607,2.1280525 8.78352472,1.65642103 C9.19468034,0.673901842 9.73158636,0.193946916 10.4734676,0.0331248912 C11.2036464,-0.12516034 12.2666223,0.295791979 12.9392897,1.03995414 C13.684139,1.86397017 14.0127105,2.89492167 13.8911352,4.16897582 C13.838872,4.71667099 13.6870452,5.3301477 13.4372676,6.01270565 C14.3022674,5.8881032 15.1619273,5.86927699 16.0151615,5.95666541 C18.0222793,6.1622348 19.148549,7.46916076 18.9841955,9.12062866 C18.913311,9.83289448 18.6548581,10.4377417 18.2162102,10.9127663 C18.5848501,11.624358 18.7315959,12.3266504 18.6399064,13.01249 C18.5342981,13.8024424 18.0938139,14.4606697 17.3615933,14.9717849 C17.3050365,15.6649876 17.1457321,16.2176207 16.8641529,16.6327126 C16.6297511,16.9782578 16.3448812,17.2576621 16.0130466,17.4656797 C15.9050245,18.1502334 15.6776602,18.6848483 15.3074649,19.061261 C14.6921032,19.6869577 13.5926808,20.0599567 12.589001,19.9920727 C11.6364602,19.9276476 11.0723519,19.8117289 9.74225286,19.3921834 C8.86450134,19.1153193 7.04881088,18.6545996 4.31132055,18.0151077 L1.31780294,18.0148644 Z M3.01948917,9.18352286 C3.01948917,8.80716922 3.32340849,8.50207431 3.69831198,8.50207431 C4.07321546,8.50207431 4.37713478,8.80716922 4.37713478,9.18352286 L4.37713478,16.8619216 C4.37713478,17.2382753 4.07321546,17.5433702 3.69831198,17.5433702 C3.32340849,17.5433702 3.01948917,17.2382753 3.01948917,16.8619216 L3.01948917,9.18352286 Z"></path>
+                </svg>
+              </button>
+              <p id="likeCount" class="text-md cursor-pointer {% if user_liked %}text-green-500{% endif %}">{{ like_count }}</p>
+            </div>
 
-        <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'blog:comment' %}" method="post">
-          {% csrf_token %}
-          <textarea name="content" cols="10" rows="10" class="w-full rounded-t-lg bg-white focus:outline-2 outline-offset-3 outline-green-500 text-gray-700 p-4" style="height: 171px;" required="" id="id_content"></textarea>
-
-          <input type="hidden" name="post_id" value="{{ post.id }}" />
-          <div class="p-3">
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg border border-gray-300 hover:bg-green-600">Submit</button>
+            <div class="flex pt-2 text-gray-500 justify-center items-center">
+              <button type="button" class="flex justify-center items-center cursor-pointer h-8 w-8 transition border-gray-500">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="#000000">
+                  <g id="Icon-Set" transform="translate(-100.000000, -255.000000)" fill="currentColor">
+                    <path d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z" id="comment-1"></path>
+                  </g>
+                </svg>
+              </button>
+              <p id="commentCount" class="text-md cursor-pointer">{{ comment_count }}</p>
+            </div>
           </div>
-        </form>
 
-        <div id="commentList" class="mt-10">
-          {% for comment in post.comments.all %}
-            <div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
-              <div class="flex items-center">
-                <a href="{% url 'users:profile' comment.user.profile.id %}" class="flex items-center">
+          <div class="flex space-x-8">
+            <div class="flex pt-2 text-gray-500 justify-center items-center">
+              <button type="button" class="cursor-pointer">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" class="ax">
+                  <path fill="currentColor" d="M17.5 1.25a.5.5 0 0 1 1 0v2.5H21a.5.5 0 0 1 0 1h-2.5v2.5a.5.5 0 0 1-1 0v-2.5H15a.5.5 0 0 1 0-1h2.5zm-11 4.5a1 1 0 0 1 1-1H11a.5.5 0 0 0 0-1H7.5a2 2 0 0 0-2 2v14a.5.5 0 0 0 .8.4l5.7-4.4 5.7 4.4a.5.5 0 0 0 .8-.4v-8.5a.5.5 0 0 0-1 0v7.48l-5.2-4a.5.5 0 0 0-.6 0l-5.2 4z"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="flex pt-2 text-gray-500 justify-center items-center">
+              <button type="button" class="cursor-pointer">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill="currentColor" fill-rule="evenodd" d="M4.385 12c0 .55.2 1.02.59 1.41.39.4.86.59 1.41.59s1.02-.2 1.41-.59c.4-.39.59-.86.59-1.41s-.2-1.02-.59-1.41a1.93 1.93 0 0 0-1.41-.59c-.55 0-1.02.2-1.41.59-.4.39-.59.86-.59 1.41m5.62 0c0 .55.2 1.02.58 1.41.4.4.87.59 1.42.59s1.02-.2 1.41-.59c.4-.39.59-.86.59-1.41s-.2-1.02-.59-1.41a1.93 1.93 0 0 0-1.41-.59c-.55 0-1.03.2-1.42.59s-.58.86-.58 1.41m5.6 0c0 .55.2 1.02.58 1.41.4.4.87.59 1.43.59s1.03-.2 1.42-.59.58-.86.58-1.41-.2-1.02-.58-1.41a1.93 1.93 0 0 0-1.42-.59c-.56 0-1.04.2-1.43.59s-.58.86-.58 1.41" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center py-8 mx-16">
+          <a href="{% url 'users:profile' post.author.profile.id %}"><img class="w-16 h-16 rounded-full mr-4" src="{{ post.author.profile.avatar.url }}" alt="Author" /></a>
+          <div class="flex-1">
+            <a href="{% url 'users:profile' post.author.profile.id %}" class="font-bold text-xl">Bài viết của {{ post.author }}</a>
+            <p class="text-sm text-gray-600">{{ post.author.profile.followers.all.count }} người theo dõi</p>
+            <p class="text-sm text-gray-600">{{ post.author.profile.bio|default:"" }}</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-gray-500">
+            <h3 class="text-3xl font-bold text-gray-800">Bình luận (<span id="commentCount">{{ comment_count }}</span>)</h3>
+          </div>
+
+          <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'blog:comment' %}" method="post">
+            {% csrf_token %}
+            <textarea name="content" cols="10" rows="10" class="w-full rounded-t-lg bg-white focus:outline-2 outline-offset-3 outline-green-500 text-gray-700 p-4" style="height: 171px;" required="" id="id_content"></textarea>
+
+            <input type="hidden" name="post_id" value="{{ post.id }}" />
+            <div class="p-3">
+              <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg border border-gray-300 hover:bg-green-600">Submit</button>
+            </div>
+          </form>
+
+          <div id="commentList" class="mt-10">
+            {% for comment in post.comments.all %}
+              <div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
+                <div class="flex items-center">
                   <img class="w-12 h-12 rounded-full" src="{{ comment.user.profile.avatar.url }}" alt="User" />
                   <p class="hover:underline cursor-pointer">{{ comment.user }}</p>
-                </a>
+                </div>
+                <p class="text-gray-500 text-sm mb-1">Posted {{ comment.created_at }}</p>
+                <p class="">{{ comment.content }}</p>
               </div>
-              <p class="text-gray-500 text-sm mb-1">Posted {{ comment.created_at }}</p>
-              <p class="">{{ comment.content }}</p>
-            </div>
-          {% endfor %}
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +123,6 @@
 
 {% block script %}
   <script src="{% static 'blog/js/comment.js' %}"></script>
-  <script src="{% static 'blog/js/social_bar.js' %}"></script>
+  <script src="{% static 'blog/js/like.js' %}"></script>
   <script type="module" src="{% static 'blog/js/follow.js' %}"></script>
 {% endblock %}

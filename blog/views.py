@@ -1,5 +1,5 @@
 import json
-from .models import Category, Post, Comment, Tag
+from .models import Category, Post, Comment, Tag, Like
 from users.models import Profile, User
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -41,7 +41,7 @@ def post_search(request):
     # Tìm kiếm theo từ khóa
     searchQuery = (request.GET.get("searchQuery") or "").strip()
 
-    # Lấy thẻ và loại
+    # Lấy thẻ và loại 
     selected_tag = (request.GET.get("tag") or "all").strip()
     selected_category = (request.GET.get("category") or "all").strip()
 
@@ -91,10 +91,17 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        obj = self.get_object()
+        post = self.get_object()
+      
+        # Đếm số like và số bình luận
+        context['like_count'] = post.like_set.count()
+        context['comment_count'] = post.comments.count()
+        if self.request.user.is_authenticated:
+            context['user_liked'] = post.like_set.filter(user=self.request.user).exists()
+        
+        # Trạng thái theo dõi
         is_following = False
         if self.request.user.is_authenticated and self.request.user.id != obj.author.id:
             try:
@@ -104,7 +111,6 @@ class PostDetailView(DetailView):
             
         context["is_following"] = is_following
         return context
-    
 
 
 # View tạo bài viết mới
@@ -128,6 +134,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+    
 
 
 # View xóa bài viết
@@ -154,6 +161,37 @@ def delete(request, pk):
 def user_posts(request):
     return render(request, 'blog/user_post_list.html')
 
+#API thích bài viết
+@login_required
+def like(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        # Kiểm tra user đã like chưa
+        liked = Like.objects.filter(post=post, user=user).exists()
+
+        if liked:
+            # Nếu đã like → bỏ like
+            Like.objects.filter(post=post, user=user).delete()  
+            liked = False
+        else:
+            # Nếu chưa like → thêm like
+            Like.objects.create(post=post, user=user)
+            liked = True
+
+        # Đếm lại tổng số like hiện tại
+        like_count = post.like_set.count()
+
+        return JsonResponse({
+            'status': 'success',
+            'liked': liked,
+            'like_count': like_count
+        })
+    else:
+        return JsonResponse({'error': 'Request không hợp lệ'}, status=400)
 
 # API bình luận vào bài viết
 @login_required
