@@ -145,15 +145,11 @@ def edit_profile_view(request):
                 update_session_auth_hash(request, user_obj)
                 return redirect('users:password_change_done')
         elif 'profile_submit' in request.POST:
-            print(request.POST)
-            print('thay doi profile')
             valid_profile = profile_form.is_valid()
             if valid_profile:
                 profile_form.save()
                 return redirect('users:profile', pk=user.pk)
         elif 'user_submit' in request.POST:
-            print(request.POST)
-            print('thay doi user')
             valid_user = user_form.is_valid()
             if valid_user:
                 user_form.save()

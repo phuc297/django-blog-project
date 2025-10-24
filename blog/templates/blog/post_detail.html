@@ -84,7 +84,7 @@
           <div class="flex-1">
             <a href="{% url 'users:profile' post.author.profile.id %}" class="font-bold text-xl">Bài viết của {{ post.author }}</a>
             <p class="text-sm text-gray-600">{{ post.author.profile.followers.all.count }} người theo dõi</p>
-            <p class="text-sm text-gray-600">{{ post.author.profile.bio|default:"" }}</p>
+            <p class="text-sm text-gray-600">{{ post.author.profile.bio|default:'' }}</p>
           </div>
         </div>
 
@@ -106,10 +106,10 @@
           <div id="commentList" class="mt-10">
             {% for comment in post.comments.all %}
               <div class="bg-white border border-gray-200 rounded-lg my-3 p-4">
-                <div class="flex items-center">
-                  <img class="w-12 h-12 rounded-full" src="{{ comment.user.profile.avatar.url }}" alt="User" />
+                <a href="{% url 'users:profile' comment.user.profile.id %}" class="flex items-center">
+                  <img class="w-12 h-12 rounded-full mr-1" src="{{ comment.user.profile.avatar.url }}" alt="User" />
                   <p class="hover:underline cursor-pointer">{{ comment.user }}</p>
-                </div>
+                </a>
                 <p class="text-gray-500 text-sm mb-1">Posted {{ comment.created_at }}</p>
                 <p class="">{{ comment.content }}</p>
               </div>

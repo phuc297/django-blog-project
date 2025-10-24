@@ -103,9 +103,9 @@ class PostDetailView(DetailView):
         
         # Trạng thái theo dõi
         is_following = False
-        if self.request.user.is_authenticated and self.request.user.id != obj.author.id:
+        if self.request.user.is_authenticated and self.request.user.id != post.author.id:
             try:
-                is_following = obj.author.profile in self.request.user.profile.following.all()
+                is_following = post.author.profile in self.request.user.profile.following.all()
             except Profile.DoesNotExist:
                 pass
             
