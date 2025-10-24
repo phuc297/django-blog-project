@@ -14,12 +14,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- User fields (username, email) -->
       <div>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post">
           {% csrf_token %}
           <h3 class="font-semibold mb-2">Thông tin tài khoản</h3>
           {{ user_form|crispy }}
           <div class="mt-4">
-            <button type="submit" name="profile_submit" class="px-4 py-2 bg-green-600 text-white rounded">Lưu thông tin</button>
+            <button type="submit" name="user_submit" class="px-4 py-2 bg-green-600 text-white rounded">Lưu thông tin</button>
           </div>
         </form>
       </div>
@@ -27,9 +27,19 @@
       <!-- Profile fields (avatar, bio) -->
       <div>
         <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
+          <input type="hidden" name="csrfmiddlewaretoken" value="CFvc0RAjis8m6e5KkzFVl5IFBOpDKrSow4P43tsTI8gDuqQqP60MBrfrAxJvqQSQ" />
           <h3 class="font-semibold mb-2">Hồ sơ cá nhân</h3>
-          {{ profile_form|crispy }}
+
+          <div id="div_id_avatar" class="mb-3">
+            <label for="id_avatar" class="block text-gray-700 text-sm font-bold mb-2">Avatar<span class="asteriskField">*</span></label>
+
+            <img src="{{ user.profile.avatar.url }}" class="w-10 h-10 rounded-full border" alt="User Avatar" />
+            <input type="file" name="avatar" accept="image/*" class="clearablefileinput" id="id_avatar" />
+            <input type="hidden" name="initial-avatar" value="avatars/429707369_367814772711854_6479357114470768829_n.jpg" id="initial-id_avatar" />
+          </div> <div id="div_id_bio" class="mb-3">
+            <label for="id_bio" class="block text-gray-700 text-sm font-bold mb-2">Bio</label> <textarea name="bio" cols="40" rows="3" class="textarea border-gray-300 leading-normal appearance-none text-gray-700 w-full px-4 bg-white rounded-lg block py-2 border focus:outline-none" id="id_bio">dfgdsfg</textarea>
+          </div>
+
           <div class="mt-4">
             <button type="submit" name="profile_submit" class="px-4 py-2 bg-green-600 text-white rounded">Lưu hồ sơ</button>
           </div>
