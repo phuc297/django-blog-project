@@ -5,8 +5,15 @@
 **apps folders**: users, blog
 
 
-# 1 Tạo môi trường
+# 1 Cài đặt và tạo môi trường
 
+```
+git clone git@github.com:phuc297/django-blog-project.git
+```
+
+```
+cd django-blog-project
+```
 
 ```
 python -m venv venv
