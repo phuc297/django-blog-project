@@ -19,6 +19,7 @@
           <p class="text-gray-600 mt-2">{{ profile.bio|default:'No bio available.' }}</p>
 
           <div class="mt-3 flex space-x-6 text-gray-500 text-sm">
+<<<<<<< HEAD
             <span>{{ profile.followers.count }} người theo dõi</span>
             <span>{{ profile.following.count }} đang theo dõi</span>
             <span>{{ profile.user.posts.count }} bài viết</span>
@@ -37,10 +38,33 @@
         <ul class="flex">
           <li class="tab-item p-4 hover:text-green-500 border-b-2 border-green-500 text-green-500">
             <a href="#">Bài viết ({{ profile.user.posts.count }})</a>
+=======
+            <span>{{ profile.followers.count }} followers</span>
+            <span>{{ profile.following.count }} following</span>
+            <span>{{ profile.user.posts.count }} posts</span>
+          </div>
+
+          <button id="btn-follow" class="mt-4 px-4 py-2 text-xs font-bold rounded-full border border-gray-500 text-gray-500">Theo dõi</button>
+
+          <!-- Change password link for the logged-in user -->
+          
+
+      <div class="text-sm font-medium text-center text-gray-500">
+        <ul class="flex">
+          <li class="tab-item p-4 hover:text-green-500 border-b-2 border-green-500 text-green-500">
+            <a href="#">Bài viết</a>
+          </li>
+          <li class="tab-item p-4 hover:text-green-500">
+            <a href="#">Người theo dõi</a>
+          </li>
+          <li class="tab-item p-4 hover:text-green-500">
+            <a href="#">Đang theo dõi</a>
+>>>>>>> a4939c0 (Tuy chinh ho so)
           </li>
         </ul>
       </div>
 
+<<<<<<< HEAD
       <div class="tab-content p-4 rounded-lg" role="tabpanel">
         {% if profile.user.posts.exists %}
           <div class="flex text-sm font-medium text-center text-gray-500 my-4">
@@ -54,6 +78,33 @@
         <div id="userPosts" data-url="{% url 'users:posts' profile.user.id %}">
           {% include 'users/partials/posts.html' with page_obj=page_obj user_id=profile.user.id %}
         </div>
+=======
+      <div class="tab-content p-4 rounded-lg" id="styled-profile" role="tabpanel">
+        <h2 class="text-2xl font-bold mb-4">Bài viết</h2>
+
+        {% if profile.user.posts.exists %}
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {% for post in profile.user.posts.all %}
+              <div class="bg-white rounded-lg shadow-sm h-full flex flex-col">
+                <a href="{% url 'blog:detail' post.id %}"><img src="{{ post.thumbnail.url }}" alt="Thumbnail" class="rounded-t-lg w-full h-48 object-cover cursor-pointer" /></a>
+
+                <div class="p-4 flex flex-col justify-between h-full">
+                  <div>
+                    <a href="{% url 'blog:detail' post.id %}"><h3 class="font-semibold hover:text-green-600">{{ post.title }}</h3></a>
+                    <p class="text-sm italic text-gray-700">{{ post.description|truncate_words:10 }}</p>
+                  </div>
+
+                  <div class="text-xs text-gray-500 mt-3">
+                    <span>{{ post.created_at }}</span>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-gray-600">No posts available.</p>
+        {% endif %}
+>>>>>>> a4939c0 (Tuy chinh ho so)
       </div>
     </div>
   </div>
@@ -61,6 +112,9 @@
 
 {% block script %}
   <script src="{% static 'users/js/tab_controller.js' %}"></script>
+<<<<<<< HEAD
   <script src="{% static 'users/js/post_sort.js' %}"></script>
   <script type="module" src="{% static 'users/js/follow.js' %}"></script>
+=======
+>>>>>>> a4939c0 (Tuy chinh ho so)
 {% endblock %}

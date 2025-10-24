@@ -145,3 +145,4 @@ LOGIN_URL = 'users:login'              # Khi truy cập view yêu cầu đăng n
 LOGIN_REDIRECT_URL = 'blog:page'       # Sau khi đăng nhập thành công, người dùng sẽ được chuyển tới trang này
 LOGOUT_REDIRECT_URL = 'users:login'
 REGISTER_REDIRECT_URL = 'users:login'
+PASSWORD_CHANGE_REDIRECT_URL = reverse_lazy('users:profile')

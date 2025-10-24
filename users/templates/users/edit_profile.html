@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load content_filters %}
+
+{% block title %}
+  Tùy chỉnh hồ sơ
+{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Chỉnh sửa hồ sơ</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- User fields (username, email) -->
+      <div>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <h3 class="font-semibold mb-2">Thông tin tài khoản</h3>
+          {{ user_form|crispy }}
+          <div class="mt-4">
+            <button type="submit" name="profile_submit" class="px-4 py-2 bg-green-600 text-white rounded">Lưu thông tin</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Profile fields (avatar, bio) -->
+      <div>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <h3 class="font-semibold mb-2">Hồ sơ cá nhân</h3>
+          {{ profile_form|crispy }}
+          <div class="mt-4">
+            <button type="submit" name="profile_submit" class="px-4 py-2 bg-green-600 text-white rounded">Lưu hồ sơ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Password change section -->
+    <div class="mt-8">
+      <h3 class="font-semibold mb-2">Đổi mật khẩu</h3>
+      <form method="post">
+        {% csrf_token %}
+        {{ password_form|crispy }}
+        <div class="mt-4">
+          <button type="submit" name="password_submit" class="px-4 py-2 bg-yellow-600 text-white rounded">Đổi mật khẩu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
