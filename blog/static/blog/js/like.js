@@ -1,7 +1,7 @@
-document.querySelector("#sticky-bar #like").addEventListener("click", async (e) => {
+document.querySelector("#likeButton").addEventListener("click", async (e) => {
     e.preventDefault()
-    const likeButton = document.querySelector("#sticky-bar #like");
-    const likeCountElem = document.querySelector("#sticky-bar p.text-xl");
+    const likeButton = document.querySelector("#likeButton");
+    const likeCountElem = document.querySelector("#likeCount");
     form = document.getElementById('commentForm')
     csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
     post_id = form.querySelector('[name=post_id]').value
@@ -47,8 +47,10 @@ document.querySelector("#sticky-bar #like").addEventListener("click", async (e) 
        likeCountElem.textContent = result.like_count;
         if (result.liked) {
             likeButton.classList.add("text-green-500", "border-green-500");
+            likeCountElem.classList.add("text-green-500");
         } else {
             likeButton.classList.remove("text-green-500", "border-green-500");
+            likeCountElem.classList.remove("text-green-500");
         }
     } else {
         console.error(result.error)

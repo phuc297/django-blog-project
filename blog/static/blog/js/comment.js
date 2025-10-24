@@ -6,7 +6,6 @@
         csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
         post_id = form.querySelector('[name=post_id]').value
         content = form.querySelector('[name=content]').value
-        console.log(form.action)
         const response = await fetch(form.action, {
             method: 'POST',
             headers: {
@@ -53,12 +52,13 @@
               <p class="">${result.content}</p>
             </div>`
 
-            const cmtElem = document.getElementById("comment-count");
-            const currentText = cmtElem.textContent.trim();
-            const currentCount = parseInt(currentText.replace(/[^\d]/g, "")) || 0;
-            const newCount = currentCount + 1;
-            console.log(newCount);
-            cmtElem.textContent = ` (${newCount})`;
+            const cmtElems = document.querySelectorAll("#commentCount");
+            cmtElems.forEach(cmtElem => {
+                const currentText = cmtElem.textContent.trim();
+                const currentCount = parseInt(currentText)
+                const newCount = currentCount + 1;
+                cmtElem.textContent = `${newCount}`;
+            });
 
             document.getElementById('commentList').insertAdjacentHTML('afterbegin', newCommentDiv)
             form.querySelector('[name=content]').value = ''
