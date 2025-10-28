@@ -1,14 +1,16 @@
 import json
-from .models import Category, Post, Comment, Tag, Like
-from users.models import Profile, User
-from .forms import PostForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
-from django.http import HttpResponse, JsonResponse
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.paginator import Paginator
 from django.db.models import Count
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
+
+from users.models import Profile
+from .forms import PostForm
+from .models import Category, Post, Comment, Tag, Like
 
 
 def post_search(request):
@@ -94,13 +96,13 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.get_object()
-      
+
         # Đếm số like và số bình luận
         context['like_count'] = post.like_set.count()
         context['comment_count'] = post.comments.count()
         if self.request.user.is_authenticated:
             context['user_liked'] = post.like_set.filter(user=self.request.user).exists()
-        
+
         # Trạng thái theo dõi
         is_following = False
         if self.request.user.is_authenticated and self.request.user.id != post.author.id:
@@ -108,7 +110,7 @@ class PostDetailView(DetailView):
                 is_following = post.author.profile in self.request.user.profile.following.all()
             except Profile.DoesNotExist:
                 pass
-            
+
         context["is_following"] = is_following
         return context
 
@@ -134,7 +136,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
-    
+
 
 
 # View xóa bài viết
@@ -175,7 +177,7 @@ def like(request):
 
         if liked:
             # Nếu đã like → bỏ like
-            Like.objects.filter(post=post, user=user).delete()  
+            Like.objects.filter(post=post, user=user).delete()
             liked = False
         else:
             # Nếu chưa like → thêm like

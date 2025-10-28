@@ -1,7 +1,7 @@
 import os
 import random
-from django.conf import settings
 
+from django.conf import settings
 
 DEFAULT_THUMBNAIL_POST_PATH = f'{settings.MEDIA_FOLDER}/default_thumbnails'
 

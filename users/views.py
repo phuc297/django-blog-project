@@ -1,26 +1,20 @@
 import json
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 
-from django.views.generic import DetailView, UpdateView
-from django.contrib.auth.decorators import login_required
-
-from users.forms import RegisterForm, LoginForm
-from django.contrib.auth import login, authenticate, logout
-from .models import Profile, User
-from django.db.models import Count
-from django.core.paginator import Paginator
-
-from django.shortcuts import redirect, render
-from django.urls import reverse
-from django.views.generic import DetailView, UpdateView
-from users.forms import RegisterForm, LoginForm, UserUpdateForm, ProfileUpdateForm
-from django.contrib.auth import login, authenticate, logout
-from .models import Profile
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import login, logout
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.paginator import Paginator
+from django.db.models import Count
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.views.generic import DetailView
+
+from users.forms import RegisterForm, LoginForm, UserUpdateForm, ProfileUpdateForm
+from .models import Profile
+from .models import User
 
 
 class ProfileView(DetailView):

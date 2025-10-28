@@ -1,17 +1,21 @@
 <div class="pagination mt-4 flex justify-center items-center space-x-4 mt-6">
   {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}
-      {% endif %}">
-      ↩ Trước
+    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}
+        &searchQuery={{ searchQuery }}
+      {% endif %}"
+      class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
+      ← Trước
     </a>
   {% endif %}
 
-  <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-base font-semibold shadow">Trang {{ page_obj.number }} trên {{ page_obj.paginator.num_pages }}</span>
+  <span class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200">Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
   {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}
-      {% endif %}">
-      Sau ↪
+    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}
+        &searchQuery={{ searchQuery }}
+      {% endif %}"
+      class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
+      Sau →
     </a>
   {% endif %}
 </div>
