@@ -16,11 +16,11 @@ User = get_user_model()
 
 # Tùy chỉnh
 NUMBER_OF_USERS = 20  # Số lượng người dùng (User)
-NUMBER_OF_CATEGORIES = 10  # Số lượng danh mục (Category)
+NUMBER_OF_CATEGORIES = 20  # Số lượng danh mục (Category)
 NUMBER_OF_TAGS = 30  # Số lượng thẻ/nhãn (Tag)
-NUMBER_OF_POSTS = 100  # Số lượng bài viết (Post)
+NUMBER_OF_POSTS = 500  # Số lượng bài viết (Post)
 NUMBER_OF_COMMENTS = 5 * NUMBER_OF_POSTS  # Tổng số lượng bình luận (Comment)
-MIN_FOLLOWERS_PER_USER = 2
+MIN_FOLLOWERS_PER_USER = 3
 MAX_FOLLOWERS_PER_USER = 5
 
 
@@ -77,7 +77,7 @@ class Fake:
         for i in range(n_posts):
             mock_post = {
                 "author": choice(users),
-                "title": fake.sentence(randrange(8, 20)),
+                "title": fake.sentence(randrange(4, 5)),
                 "description": fake.sentence(randrange(10, 20)),
                 "content": fake.paragraph(150),
                 "list_categories": random.sample(list(categories), randrange(1, 3)),

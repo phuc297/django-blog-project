@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
 
-from users.models import Profile
+from users.models import Profile, User
 from .forms import PostForm
 from .models import Category, Post, Comment, Tag, Like
 
@@ -45,7 +45,7 @@ def post_search(request):
     if not searchAdvancedQuery:
         searchAdvancedQuery = ["title"]
 
-    # Lấy thẻ và loại 
+    # Lấy thẻ và loại
     selected_tag = (request.GET.get("tag") or "all").strip()
     selected_category = (request.GET.get("category") or "all").strip()
 
@@ -104,6 +104,7 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.get_object()
@@ -112,7 +113,8 @@ class PostDetailView(DetailView):
         context['like_count'] = post.like_set.count()
         context['comment_count'] = post.comments.count()
         if self.request.user.is_authenticated:
-            context['user_liked'] = post.like_set.filter(user=self.request.user).exists()
+            context['user_liked'] = post.like_set.filter(
+                user=self.request.user).exists()
 
         # Trạng thái theo dõi
         is_following = False
@@ -149,7 +151,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return post.author == self.request.user
 
 
-
 # View xóa bài viết
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
@@ -157,6 +158,20 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return post.author == self.request.user
+
+
+# View hiển thị danh sách bài viết của user
+def user_posts(request):
+    user = request.user
+
+    # Lấy danh sách bài viết của user
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+
+    context = {
+        'posts': posts,
+        'user_profile': user,   # 👈 đổi key để tránh trùng với request.user
+    }
+    return render(request, 'blog/user_post_list.html', context)
 
 
 # API xóa bài viết
@@ -170,11 +185,7 @@ def delete(request, pk):
     return JsonResponse({'thong bao': f'da xoa bai viet {title}'})
 
 
-# View hiển thị danh sách bài viết của user
-def user_posts(request):
-    return render(request, 'blog/user_post_list.html')
-
-#API thích bài viết
+# API thích bài viết
 @login_required
 def like(request):
     if request.method == 'POST':
@@ -205,6 +216,7 @@ def like(request):
         })
     else:
         return JsonResponse({'error': 'Request không hợp lệ'}, status=405)
+
 
 # API bình luận vào bài viết
 @login_required
