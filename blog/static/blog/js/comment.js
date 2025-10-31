@@ -1,5 +1,7 @@
 (function initCommentForm() {
-    form = document.getElementById('commentForm')
+    const form = document.getElementById('commentForm')
+    const errorBox = document.getElementById('actionErrorBox');
+    const errorText = document.getElementById('actionErrorText');
     form.addEventListener('submit', async (e) => {
         e.preventDefault()
         csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
@@ -62,7 +64,9 @@
             document.getElementById('commentList').insertAdjacentHTML('afterbegin', newCommentDiv)
             form.querySelector('[name=content]').value = ''
         } else {
-            console.error(result.error)
+            //console.error(result.error)
+            errorText.textContent = result.error || 'Lỗi khi đăng bình luận';
+            errorBox.classList.remove('hidden');
         }
     })
 })();

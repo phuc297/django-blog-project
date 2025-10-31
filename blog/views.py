@@ -3,7 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
@@ -11,7 +11,6 @@ from django.views.generic import CreateView, UpdateView, DetailView, ListView, D
 from users.models import Profile
 from .forms import PostForm
 from .models import Category, Post, Comment, Tag, Like
-
 
 def post_search(request):
 
@@ -42,6 +41,9 @@ def post_search(request):
 
     # Tìm kiếm theo từ khóa
     searchQuery = (request.GET.get("searchQuery") or "").strip()
+    searchAdvancedQuery = request.GET.getlist("searchAdvancedQuery")
+    if not searchAdvancedQuery:
+        searchAdvancedQuery = ["title"]
 
     # Lấy thẻ và loại 
     selected_tag = (request.GET.get("tag") or "all").strip()
@@ -60,7 +62,15 @@ def post_search(request):
         posts = posts.filter(categories__name__icontains=selected_category)
 
     if searchQuery:
-        posts = posts.filter(title__icontains=searchQuery)
+        q_filter = Q()
+        if "title" in searchAdvancedQuery:
+            q_filter |= Q(title__icontains=searchQuery)
+        if "content" in searchAdvancedQuery:
+            q_filter |= Q(content__icontains=searchQuery)
+        if "author" in searchAdvancedQuery:
+            q_filter |= Q(author__username__icontains=searchQuery)
+        posts = posts.filter(q_filter).distinct()
+
 
     # Phân trang
     paginator = Paginator(posts, 10)
@@ -74,7 +84,8 @@ def post_search(request):
                            'tags': tags,
                            'categories': categories,
                            'selected_tag': selected_tag,
-                           'selected_category': selected_category})
+                           'selected_category': selected_category,
+                           'search_advanced': searchAdvancedQuery,})
 
 
 # View hiển thị danh sách bài viết
@@ -193,7 +204,7 @@ def like(request):
             'like_count': like_count
         })
     else:
-        return JsonResponse({'error': 'Request không hợp lệ'}, status=400)
+        return JsonResponse({'error': 'Request không hợp lệ'}, status=405)
 
 # API bình luận vào bài viết
 @login_required
