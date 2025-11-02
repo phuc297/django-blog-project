@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+  <div class="m-auto mt-10">
+    <h3>Mày có chắc muốn xóa bài viết này ? </h3>
+    <form method="post">
+      {% csrf_token %}
+      <div>
+        <input type="hidden" name="post" value="yes">
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+        {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+        <input type="submit" value="Yes, I’m sure" class="p-3 cursor-pointer border rounded-lg bg-red-500 text-white">
+        <a href="{% url 'blog:user_posts' %}" class="p-3 border rounded-lg bg-gray-500 text-white">No, take me back</a>
+      </div>
+    </form>
+  </div>
+{% endblock content %}
+
+{% block footer %}
+{% endblock %}

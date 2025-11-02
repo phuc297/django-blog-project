@@ -28,15 +28,7 @@ class ProfileView(DetailView):
         paginator = Paginator(obj.user.posts.all(), 9)
         page_obj = paginator.get_page('1')
 
-        is_following = False
-        if self.request.user.is_authenticated and self.request.user.id != obj.id:
-            try:
-                is_following = obj in self.request.user.profile.following.all()
-            except Profile.DoesNotExist:
-                pass
-
         context['page_obj'] = page_obj
-        context['is_following'] = is_following
         return context
 
 

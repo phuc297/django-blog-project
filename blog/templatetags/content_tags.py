@@ -1,6 +1,6 @@
-import random
 from django import template
 from django.db.models import Count
+
 from blog.models import Category, Post, Tag
 from users.models import User
 
@@ -13,11 +13,14 @@ def top_posts(count=3):
     return {'posts': posts}
 
 
-@register.inclusion_tag('blog//partials/top_authors.html')
-def top_authors(count=5):
+@register.inclusion_tag('blog//partials/top_authors.html', takes_context=True)
+def top_authors(context, count=5):
+    request = context["request"]
+    user = request.user
     authors = User.objects.annotate(
         post_count=Count('posts')).order_by('-post_count')[:count]
-    return {'authors': authors}
+    return {'user': user,
+            'authors': authors}
 
 
 @register.inclusion_tag('blog//partials/top_categories.html')

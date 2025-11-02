@@ -1,17 +1,16 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load query_tags %}
 
 {% block title %}
   Django Blog
 {% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/post_list.css' %}" />
-{% endblock %}
 
 {% block content %}
   <div class="w-2/5 mx-auto">
-    <h1 class="font-bold text-3xl md:text-4xl text-center pt-4 pb-2">Kết quả tìm kiếm cho <span class="text-green-500 italic">"{{ searchQuery }}"</span></h1>
+    <h1 class="font-bold text-3xl md:text-4xl text-center pt-4 pb-2">Kết quả tìm kiếm cho
+      <span class="text-green-500 italic">"{{ search_query }}"</span></h1>
 
     <div class="text-center mt-4">
       <button id="toggleAccordionBtn" class="bg-green-500 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition">Hiện bộ lọc</button>
@@ -22,24 +21,28 @@
       <div id="divAdvancedSearch">
         <form method="get" action="{% url 'blog:search' %}">
           <input type="hidden" name="searchQuery" value="{{ request.GET.searchQuery }}">
+          <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+          <input type="hidden" name="tag" value="{{ selected_tag }}">
+          <input type="hidden" name="category" value="{{ selected_category }}">
+
           <label class="flex font-medium text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 mt-1" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z" />
-              </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 mt-1" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z"></path>
+            </svg>
             Tìm kiếm theo:
           </label>
           <hr class="my-1">
           <div class="flex space-x-20 mt-2 text-sm text-gray-800">
             <label class="flex items-center space-x-2">
-              <input class="searchCheckBox" type="checkbox" name="searchAdvancedQuery" value="title" {% if "title" in search_advanced %}checked{% endif %}>
+              <input class="searchCheckBox" type="checkbox" name="searchFields" value="title" {% if "title" in search_fields %}checked{% endif %}>
               <span>Tiêu đề</span>
             </label>
             <label class="flex items-center space-x-2">
-              <input class="searchCheckBox" type="checkbox" name="searchAdvancedQuery" value="content" {% if "content" in search_advanced %}checked{% endif %}>
+              <input class="searchCheckBox" type="checkbox" name="searchFields" value="content" {% if "content" in search_fields %}checked{% endif %}>
               <span>Nội dung</span>
             </label>
             <label class="flex items-center space-x-2">
-              <input class="searchCheckBox" type="checkbox" name="searchAdvancedQuery" value="author" {% if "author" in search_advanced %}checked{% endif %}>
+              <input class="searchCheckBox" type="checkbox" name="searchFields" value="author" {% if "author" in search_fields %}checked{% endif %}>
               <span>Người đăng</span>
             </label>
             <button type="submit" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-1 rounded-lg transition-colors duration-200">Tìm →</button>
@@ -50,19 +53,20 @@
       <div id="divSort">
         <form method="get" action="{% url 'blog:search' %}">
           <input type="hidden" name="searchQuery" value="{{ request.GET.searchQuery }}">
-          <input type="hidden" name="category" value="{{ request.GET.category }}">
-          <input type="hidden" name="tag" value="{{ request.GET.tag }}">
-          {% for adv in search_advanced %}
-            <input type="hidden" name="searchAdvancedQuery" value="{{ adv }}">
+          <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+          <input type="hidden" name="tag" value="{{ selected_tag }}">
+          <input type="hidden" name="category" value="{{ selected_category }}">
+          {% for adv in search_fields %}
+            <input type="hidden" name="searchFields" value="{{ adv }}">
           {% endfor %}
           <label class="flex font-medium text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" 
-              class="h-6 w-5 mr-1" 
-              viewBox="0 0 20 20" 
-              fill="currentColor">
-              <path fill-rule="evenodd" 
-                    d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h4a1 1 0 110 2H4a1 1 0 01-1-1z" 
-                    clip-rule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-6 w-5 mr-1"
+                 viewBox="0 0 20 20"
+                 fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h4a1 1 0 110 2H4a1 1 0 01-1-1z"
+                    clip-rule="evenodd"></path>
             </svg>
             Sắp xếp theo:
           </label>
@@ -80,7 +84,7 @@
               <input class="sortRadio" type="radio" name="sort" value="like" {% if request.GET.sort == "like" %}checked{% endif %}>
               <span>Lượt thích</span>
             </label>
-              <label class="flex items-center space-x-2">
+            <label class="flex items-center space-x-2">
               <input class="sortRadio" type="radio" name="sort" value="comment" {% if request.GET.sort == "comment" %}checked{% endif %}>
               <span>Bình luận</span>
             </label>
@@ -93,14 +97,16 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 
                     01-.293.707L12 12.414V16a1 1 0 01-1.447.894l-2-1A1 
-                    1 0 018 15v-2.586L3.293 6.707A1 1 0 013 6V4z" clip-rule="evenodd" />
-          </svg>Lọc theo:
+                    1 0 018 15v-2.586L3.293 6.707A1 1 0 013 6V4z" clip-rule="evenodd"></path>
+          </svg>
+          Lọc theo:
         </label>
-        <hr class="mb-3 mt-1" />
+
+        <hr class="mb-3 mt-1"/>
         <div id="divCategory" class="flex flex-wrap gap-2">
           <label class="font-semibold text-sm ml-1">Loại:</label>
-            <a href="?category=all{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery}}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-            class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
+          <a href="{% url_replace request category="all" %}"
+             class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
                     {% if selected_category == 'all' %}
                       bg-green-600 text-white
                     {% else %}
@@ -109,114 +115,29 @@
             Tất cả
           </a>
           {% for cat in categories %}
-            <a href="?category={{ cat.name }}{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-              class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
-                      {% if cat.name == selected_category %}
-                
-                
-                
-                
-                
-                
-                
-                
-                        bg-green-600 text-white
-
-
-
-
-
-
-
-
-              {% else %}
-                
-                
-                
-                
-                
-                
-                
-                
-                        bg-gray-200 hover:bg-gray-300
-
-
-
-              {% endif %}">
+            <a href="{% url_replace request category=cat.name %}"
+               class="px-5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium cursor-pointer 
+              {% if cat.name == selected_category %} bg-green-600 text-white {% else %} bg-gray-200 hover:bg-gray-300 {% endif %}">
               {{ cat.name }}
             </a>
           {% endfor %}
         </div>
-        <hr class="ml-4 mr-4 mt-2 mb-3 border-gray-400" />
+
+        <hr class="ml-4 mr-4 mt-2 mb-3 border-gray-400"/>
         <div id="divTag" class="flex flex-wrap gap-2">
           <label class="font-semibold text-sm ml-1">Thẻ:</label>
-          <a href="?tag=all{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-            class="px-3 py-1 rounded-full text-sm cursor-pointer {% if selected_tag == 'all' %}
-              
-              
-              
-              
-              
-              
-                bg-blue-600 text-white
-
-
-
-
-
-
-            {% else %}
-              
-              
-              
-              
-              
-              
-               bg-gray-200 hover:bg-gray-300
-
-
-
-
-
-
-            {% endif %}">
+          <a href="{% url_replace request tag="all" %}"
+             class="px-3 py-1 rounded-full text-sm cursor-pointer {% if selected_tag == 'all' %} bg-blue-600 text-white  {% else %} bg-gray-200 hover:bg-gray-300{% endif %}">
             Tất cả
           </a>
           {% for tag in tags %}
-            <a href="?tag={{ tag.name }}{% if request.GET.searchQuery %}&searchQuery={{ request.GET.searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-              class="px-3 py-1 rounded-full text-sm cursor-pointer {% if tag.name == selected_tag %}
-                
-                
-                
-                
-                
-                
-                 bg-blue-600 text-white
-
-
-
-
-
-
-              {% else %}
-                
-                
-                
-                
-                
-                
-                bg-gray-200 hover:bg-gray-300
-
-
-
-
-
-
-              {% endif %}">
+            <a href="{% url_replace request tag=tag.name %}"
+               class="px-3 py-1 rounded-full text-sm cursor-pointer {% if tag.name == selected_tag %} bg-blue-600 text-white {% else %} bg-gray-200 hover:bg-gray-300{% endif %}">
               {{ tag.name }}
             </a>
           {% endfor %}
         </div>
+
       </div>
     </div>
 
@@ -225,14 +146,16 @@
         <article class="flex flex-1 bg-white rounded-lg border border-gray-300 p-8 my-6">
           <div class="flex flex-col justify-between mx-4 flex-1">
             <a href="{% url 'blog:detail' post.id %}">
-              <h4 class="text-gray-600 font-semibold"><time datetime="{{ post.created_at|date:'c' }}"><span>{{ post.created_at|date:'F j, Y' }}</span></time></h4>
+              <h4 class="text-gray-600 font-semibold">
+                <time datetime="{{ post.created_at|date:'c' }}"><span>{{ post.created_at|date:'F j, Y' }}</span></time>
+              </h4>
               <h3 class="text-2xl font-semibold text-gray-800 hover:text-green-500">{{ post.title }}</h3>
             </a>
             <p class="text-gray-600">{{ post.description }}...</p>
 
             <div class="flex justify-between items-center mt-2">
               <a href="{% url 'users:profile' post.author.profile.id %}" class="flex items-center">
-                <img src="{{ post.author.profile.avatar.url }}" alt="Avatar" class="h-12 w-12 rounded-full" />
+                <img src="{{ post.author.profile.avatar.url }}" alt="Avatar" class="h-12 w-12 rounded-full"/>
                 <span class="font-medium hover:underline">{{ post.author }}</span>
               </a>
             </div>
@@ -255,28 +178,28 @@
               </div>
             </div>
           </div>
-          <a href="{% url 'blog:detail' post.id %}" class="mx-2"><img src="{{ post.thumbnail.url }}" alt="Thumbnail" class="hidden lg:block w-64 h-36 object-cover rounded-lg" /></a>
+          <a href="{% url 'blog:detail' post.id %}" class="mx-2"><img src="{{ post.thumbnail.url }}" alt="Thumbnail" class="hidden lg:block w-64 h-36 object-cover rounded-lg"/></a>
         </article>
       {% endfor %}
 
       <!-- Pagination controls -->
       <div class="pagination mt-4 flex justify-center items-center space-x-4 mt-6">
-  {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-      class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
-      ← Trước
-    </a>
-  {% endif %}
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
+             class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
+            ← Trước
+          </a>
+        {% endif %}
 
-  <span class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200">Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        <span class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200">Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.searchQuery %}&searchQuery={{ searchQuery }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% for adv in search_advanced %}&searchAdvancedQuery={{ adv }}{% endfor %}"
-      class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
-      Sau →
-    </a>
-  {% endif %}
-</div>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}"
+             class="page-btn px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-200 cursor-pointer">
+            Sau →
+          </a>
+        {% endif %}
+      </div>
     {% else %}
       <p class="text-center text-gray-500 mt-6">Không tìm thấy bài viết nào.</p>
     {% endif %}

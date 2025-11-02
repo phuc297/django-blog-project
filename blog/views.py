@@ -6,23 +6,16 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
 
-from users.models import Profile, User
 from .forms import PostForm
 from .models import Category, Post, Comment, Tag, Like
 
+
 def post_search(request):
-
     # Lấy kiểu sắp xếp
-    sort = (request.GET.get("sort") or "-created_at").strip()
-
-    if not sort:
-        sort = '-created_at'
-    else:
-        allowed_sorts = ["created_at", "-created_at", "like", "comment"]
-        if sort not in allowed_sorts:
-            sort = "-created_at"
+    sort = request.GET.get("sort", "-created_at")
 
     tags = Tag.objects.all()
     categories = Category.objects.all()
@@ -40,52 +33,44 @@ def post_search(request):
             posts = Post.objects.all().order_by(sort)
 
     # Tìm kiếm theo từ khóa
-    searchQuery = (request.GET.get("searchQuery") or "").strip()
-    searchAdvancedQuery = request.GET.getlist("searchAdvancedQuery")
-    if not searchAdvancedQuery:
-        searchAdvancedQuery = ["title"]
+    search_query = request.GET.get("searchQuery", "")
+    search_fields = request.GET.getlist("searchFields", ["title"])
 
     # Lấy thẻ và loại
-    selected_tag = (request.GET.get("tag") or "all").strip()
-    selected_category = (request.GET.get("category") or "all").strip()
+    selected_tag = request.GET.get("tag", "all")
+    selected_category = request.GET.get("category", "all")
 
-    if (not selected_tag):
-        selected_tag = 'all'
-
-    if selected_tag != 'all':
-        posts = posts.filter(tags__name__icontains=selected_tag)
-
-    if (not selected_category):
-        selected_category = 'all'
-
-    if selected_category != 'all':
-        posts = posts.filter(categories__name__icontains=selected_category)
-
-    if searchQuery:
+    if search_query:
         q_filter = Q()
-        if "title" in searchAdvancedQuery:
-            q_filter |= Q(title__icontains=searchQuery)
-        if "content" in searchAdvancedQuery:
-            q_filter |= Q(content__icontains=searchQuery)
-        if "author" in searchAdvancedQuery:
-            q_filter |= Q(author__username__icontains=searchQuery)
+        if "title" in search_fields:
+            q_filter |= Q(title__icontains=search_query)
+        if "content" in search_fields:
+            q_filter |= Q(content__icontains=search_query)
+        if "author" in search_fields:
+            q_filter |= Q(author__username__icontains=search_query)
         posts = posts.filter(q_filter).distinct()
 
+        # Lọc theo thẻ và loại
+        if selected_tag != 'all':
+            posts = posts.filter(tags__name__icontains=selected_tag)
+
+        if selected_category != 'all':
+            posts = posts.filter(categories__name__icontains=selected_category)
 
     # Phân trang
     paginator = Paginator(posts, 10)
-    page_number = (request.GET.get("page") or "1").strip()
+    page_number = request.GET.get("page", "1")
     page_obj = paginator.get_page(page_number)
 
     return render(request=request,
                   template_name='blog/post_search.html',
                   context={'page_obj': page_obj,
-                           'searchQuery': searchQuery,
+                           'search_query': search_query,
                            'tags': tags,
                            'categories': categories,
                            'selected_tag': selected_tag,
                            'selected_category': selected_category,
-                           'search_advanced': searchAdvancedQuery,})
+                           'search_fields': search_fields, })
 
 
 # View hiển thị danh sách bài viết
@@ -116,15 +101,6 @@ class PostDetailView(DetailView):
             context['user_liked'] = post.like_set.filter(
                 user=self.request.user).exists()
 
-        # Trạng thái theo dõi
-        is_following = False
-        if self.request.user.is_authenticated and self.request.user.id != post.author.id:
-            try:
-                is_following = post.author.profile in self.request.user.profile.following.all()
-            except Profile.DoesNotExist:
-                pass
-
-        context["is_following"] = is_following
         return context
 
 
@@ -154,6 +130,8 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # View xóa bài viết
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('blog:user_posts')
 
     def test_func(self):
         post = self.get_object()
@@ -167,9 +145,13 @@ def user_posts(request):
     # Lấy danh sách bài viết của user
     posts = Post.objects.filter(author=user).order_by('-created_at')
 
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page', '1')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'posts': posts,
-        'user_profile': user,   # 👈 đổi key để tránh trùng với request.user
+        'page_obj': page_obj,
+        'user_profile': user,
     }
     return render(request, 'blog/user_post_list.html', context)
 

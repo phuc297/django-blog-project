@@ -7,10 +7,10 @@
         <a href="/" class="text-green-500 font-extrabold text-2xl">DjangoBlog</a>
         <div class="relative flex items-center">
           <form method="get" action="{% url 'blog:search' %}">
-            <input id="txtSearch" name="searchQuery" type="text" placeholder="Tìm kiếm..." value="{{ request.GET.searchQuery|default:'' }}" class="bg-gray-100 rounded-full px-4 py-2 w-64 focus:outline-none" />
+            <input id="txtSearch" name="searchQuery" type="text" placeholder="Tìm kiếm..." value="{{ request.GET.searchQuery|default:'' }}" class="bg-gray-100 rounded-full px-4 py-2 w-64 focus:outline-none"/>
             <button id="btnSearch" onclick="" type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z" />
+                <path d="M12.9 14.32a8 8 0 111.42-1.42l4.38 4.38a1 1 0 01-1.42 1.42l-4.38-4.38zM8 14a6 6 0 100-12 6 6 0 000 12z"></path>
               </svg>
             </button>
           </form>
@@ -19,7 +19,7 @@
 
       <button id="nav-toggle" class="lg:hidden px-3 py-2 border rounded text-gray-500 hover:text-gray-900 hover:border-green-500">
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+          <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
         </svg>
       </button>
 
@@ -29,7 +29,9 @@
             <p class="mr-4 text-gray-700">Xin chào, {{ user.username }}</p>
             <a class="DX bg-green-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out btn" href="{% url 'blog:create' %}">Đăng bài</a>
             <div class="relative ml-4">
-              <button onclick="toggleDropdown()" class="focus:outline-none"><img src="{{ user.profile.avatar.url }}" class="w-10 h-10 rounded-full border" alt="User Avatar" /></button>
+              <button onclick="toggleDropdown()" class="focus:outline-none">
+                <img src="{{ user.profile.avatar.url }}" class="w-10 h-10 rounded-full border" alt="User Avatar"/>
+              </button>
               <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <a href="{% url 'users:profile' user.profile.id %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Hồ sơ cá nhân</a>
                 <a href="{% url 'blog:user_posts' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Quản lý bài viết</a>
@@ -38,18 +40,19 @@
               </div>
             </div>
             <script>
-              function toggleDropdown() {
-                var menu = document.getElementById('dropdownMenu')
-                menu.classList.toggle('hidden')
-              }
-              // Đóng dropdown khi click ra ngoài
-              document.addEventListener('click', function (event) {
-                var menu = document.getElementById('dropdownMenu')
-                var button = event.target.closest('button')
-                if (!event.target.closest('.relative.ml-4')) {
-                  menu.classList.add('hidden')
+                function toggleDropdown() {
+                    var menu = document.getElementById('dropdownMenu')
+                    menu.classList.toggle('hidden')
                 }
-              })
+
+                // Đóng dropdown khi click ra ngoài
+                document.addEventListener('click', function (event) {
+                    var menu = document.getElementById('dropdownMenu')
+                    var button = event.target.closest('button')
+                    if (!event.target.closest('.relative.ml-4')) {
+                        menu.classList.add('hidden')
+                    }
+                })
             </script>
           {% else %}
             <li class="mr-2 flex flex-col justify-center">

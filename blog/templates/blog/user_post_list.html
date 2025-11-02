@@ -6,19 +6,12 @@
   <div class="flex flex-col justify-center m-8 w-1/2">
     <h1 class="text-3xl font-bold mb-5 text-center">Quản lý bài viết</h1>
 
-    {% for post in posts %}
+    {% for post in page_obj %}
       <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-200">
         <h2 class="text-2xl font-semibold mb-2"><a href="{% url 'blog:detail' post.id %}" class="text-gray-900 hover:text-blue-600">{{ post.title }}</a></h2>
 
         <div class="text-sm text-gray-500 mb-4">
           <span>Đăng ngày: {{ post.created_at|date:'d F, Y' }}</span>
-          <span class="mx-2">|</span>
-
-          {% if post.status == 'published' %}
-            <span class="font-medium text-green-600">Đã công khai</span>
-          {% else %}
-            <span class="font-medium text-yellow-600">Bản nháp</span>
-          {% endif %}
         </div>
 
         <p class="text-gray-700 mb-4">{{ post.content|truncatewords:40 }}</p>
@@ -35,24 +28,22 @@
       </div>
     {% endfor %}
 
-    {% if is_paginated %}
-      <div class="flex justify-center mt-8">
-        {% if page_obj.has_previous %}
-          <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-l" href="?page={{ page_obj.previous_page_number }}">Trước</a>
-        {% endif %}
+    <div class="flex justify-center mt-8">
+      {% if page_obj.has_previous %}
+        <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-l" href="?page={{ page_obj.previous_page_number }}">Trước</a>
+      {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-            <a class="inline-block bg-blue-500 text-white font-bold py-2 px-4" href="?page={{ num }}">{{ num }}</a>
-          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4" href="?page={{ num }}">{{ num }}</a>
-          {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-          <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-r" href="?page={{ page_obj.next_page_number }}">Sau</a>
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a class="inline-block bg-blue-500 text-white font-bold py-2 px-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4" href="?page={{ num }}">{{ num }}</a>
         {% endif %}
-      </div>
-    {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-r" href="?page={{ page_obj.next_page_number }}">Sau</a>
+      {% endif %}
+    </div>
   </div>
 {% endblock %}

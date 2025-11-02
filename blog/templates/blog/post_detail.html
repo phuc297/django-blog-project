@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load user_filters %}
 
 {% block title %}
   {{ post.title }}
@@ -13,7 +14,12 @@
 {% block content %}
   <div class="w-full m-auto">
     <div class="w-1/2 m-auto mt-10">
-      <p class="text-gray-500 hover:underline cursor-pointer text-xl">{{ post.categories.first }}</p>
+      <p class="text-gray-500 text-xl">
+        {% for category in post.categories.all %}
+        	<span class="hover:underline cursor-pointer">{{ category.name }}</span>
+        {% endfor %}
+        
+      </p>
       <h1 class="font-bold text-3xl md:text-4xl pt-4 pb-2">{{ post.title }}</h1>
 
       <div class="flex items-center py-8">
@@ -24,7 +30,7 @@
         </div>
         <div id="following-status">
           {% if not user.id == post.author.id %}
-            {% if is_following %}
+            {% if user|is_following:author %}
               <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-green-500 text-green-500">Đang theo dõi</button>
             {% else %}
               <button id="followButton" data-url="{% url 'users:follow' %}" data-profile-id="{{ post.author.profile.id }}" class="w-36 border p-2 w-28 border-gray-500 text-gray-500">Theo dõi</button>
@@ -34,9 +40,14 @@
       </div>
 
       <article class="text-justify text-xl/8">{{ post.content }}</article>
+    <div class="p-4 mt-8 border-t border-gray-200 bg-gray-50">
+      {% for tag in post.tags.all %}
+        <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#{{ tag.name }}</span>
+      {% endfor %}
+    </div>
     </div>
 
-    <div class="mt-8 mx-16">
+    <div class="mt-2 mx-16">
       <div class="m-auto w-1/2 mx-auto pt-8 mb-16 space-y-5">
         <div class="flex justify-between py-1 mx-16">
           <div class="flex space-x-8">
@@ -128,5 +139,5 @@
 {% block script %}
   <script src="{% static 'blog/js/comment.js' %}"></script>
   <script src="{% static 'blog/js/like.js' %}"></script>
-  <script type="module" src="{% static 'blog/js/follow.js' %}"></script>
+  <script type="module" src="{% static 'users/js/follow.js' %}"></script>
 {% endblock %}
