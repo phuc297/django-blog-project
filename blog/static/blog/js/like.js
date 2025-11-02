@@ -2,6 +2,8 @@ document.querySelector("#likeButton").addEventListener("click", async (e) => {
     e.preventDefault()
     const likeButton = document.querySelector("#likeButton");
     const likeCountElem = document.querySelector("#likeCount");
+    const errorBox = document.getElementById('actionErrorBox');
+    const errorText = document.getElementById('actionErrorText');
     form = document.getElementById('commentForm')
     csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value
     post_id = form.querySelector('[name=post_id]').value
@@ -53,6 +55,8 @@ document.querySelector("#likeButton").addEventListener("click", async (e) => {
             likeCountElem.classList.remove("text-green-500");
         }
     } else {
-        console.error(result.error)
+        //console.error(result.error)
+        errorText.textContent = result.error || 'Lỗi khi thích bài viết';
+        errorBox.classList.remove('hidden');
     }
 })

@@ -93,6 +93,10 @@
             <h3 class="text-3xl font-bold text-gray-800">Bình luận (<span id="commentCount">{{ comment_count }}</span>)</h3>
           </div>
 
+          <div id="actionErrorBox" class="hidden mt-3 mb-3 p-4 rounded-lg bg-red-100 border border-red-300 text-red-700">
+            <p id="actionErrorText"></p>
+          </div>
+
           <form id="commentForm" class="my-3 rounded-lg border border-gray-300 bg-gray-100" action="{% url 'blog:comment' %}" method="post">
             {% csrf_token %}
             <textarea name="content" cols="10" rows="10" class="w-full rounded-t-lg bg-white focus:outline-2 outline-offset-3 outline-green-500 text-gray-700 p-4" style="height: 171px;" required="" id="id_content"></textarea>
