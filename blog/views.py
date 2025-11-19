@@ -15,7 +15,8 @@ from .models import Category, Post, Comment, Tag, Like
 
 def post_search(request):
     # Lấy kiểu sắp xếp
-    sort = request.GET.get("sort", "-created_at")
+    sort = request.GET.get("sort")
+    sort = request.GET.get("sort") or "-created_at"
 
     tags = Tag.objects.all()
     categories = Category.objects.all()
