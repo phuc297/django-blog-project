@@ -172,7 +172,12 @@ def delete(request, pk):
 
 # View hiển thị danh sách bài viết của user
 def user_posts(request):
-    return render(request, 'blog/user_post_list.html')
+    posts = request.user.posts.all().order_by('-created_at')  # sắp xếp mới nhất
+    paginator = Paginator(posts, 4)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'blog/user_post_list.html', {'page_obj': page_obj})
 
 #API thích bài viết
 @login_required

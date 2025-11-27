@@ -1,15 +1,65 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-  {% if user.posts.all.count != 0 %}
-    {% for post in user.posts.all %}
-      <span>
-        <a href="{% url 'blog:detail' post.id %}" class="hover:underline font-bold">{{ post.title }}</a>
-        <a href="{% url 'blog:update' post.id %}" class="hover:underline">Cập nhật</a>
-        <a href="{% url 'blog:delete' post.id %}" class="hover:underline">Xóa</a>
-      </span>
-    {% endfor %}
-  {% else %}
-      <p>Không có bài viết</p>
-  {% endif %}
+  <div class="w-11/12 md:w-2/3 mx-auto mt-8">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+      Danh sách bài viết của bn
+    </h1>
+
+    {% if page_obj.object_list %}
+      <div class="bg-white rounded-sm shadow-md divide-y divide-gray-200">
+        {% for post in page_obj %}
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 transition">
+            
+            <!-- Thông tin bài viết -->
+            <div class="flex flex-col">
+              <a href="{% url 'blog:detail' post.id %}"
+                 title="{{ post.title }}"
+                 class="text-lg font-semibold text-gray-800 hover:text-green-600 transition block truncate max-w-xl">
+                 {{ post.title }}
+              </a>
+              <span class="text-sm text-gray-500 mt-1">
+                Đăng ngày {{ post.created_at|date:"d/m/Y H:i" }}
+              </span>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="flex space-x-3 mt-3 sm:mt-0">
+              <a href="{% url 'blog:update' post.id %}" 
+                 class="px-3 py-1 text-sm font-medium text-blue-600 border border-blue-500 rounded-lg hover:bg-blue-50 transition">
+                 Cập nhật
+              </a>
+              <a href="{% url 'blog:delete' post.id %}" 
+                 class="px-3 py-1 text-sm font-medium text-red-600 border border-red-500 rounded-lg hover:bg-red-50 transition">
+                 Xóa
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- PHÂN TRANG -->
+      <div class="flex justify-center items-center mt-8 space-x-3 text-gray-700">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}"
+             class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+             ← Trước
+          </a>
+        {% endif %}
+
+        <span class="px-4 py-2 rounded-lg bg-green-100 text-green-700 font-medium border border-green-200">
+          Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}"
+             class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+             Sau →
+          </a>
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="text-gray-500 text-center mt-6 italic">Bạn chưa có bài viết nào.</p>
+    {% endif %}
+  </div>
 {% endblock %}
